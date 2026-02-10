@@ -2,6 +2,11 @@
 
 This document tracks the iterative development of the Journal & Graph AI application.
 
+
+
+## Gemini 3 hackathon submission: 
+Roughly at this point. 
+
 ## [v1.7.0] - Progression System & RPG Status Views
 - **Progression System (`@systems/progression`)**: Extracted all game logic into a pure, side-effect-free module at `src/systems/progression/`. Includes the propagation engine, EXP scaling formulas, logarithmic level curve (`Level = floor(log2(EXP + 1))`), state mutations with level-up detection, and an orchestration layer.
 - **7 Core Attributes**: Defined Vitality, Intellect, Wisdom, Social, Discipline, Creativity, and Leadership as archetypal hubs. AI classification is guided toward these attributes but never forced.

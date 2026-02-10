@@ -4,6 +4,9 @@
 **Status**: Active — see `/change-log/` for detailed session logs  
 **Last Updated**: February 10, 2026
 
+Time taken: ~70 hours 
+- inital idea conception: 20 hours
+- Rough programming time: 50 hours
 ---
 
 ## Recent Major Milestones

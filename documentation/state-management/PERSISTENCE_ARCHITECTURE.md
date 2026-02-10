@@ -58,7 +58,7 @@ interface StoreState {
 
 ### 1. **Zustand Stores (State Management)**
 - 7 stores (journal, player-statistics, user-information, user-integrations, cdag-topology, ai-config, root), each with its own persistence
-- Pattern C: Separated state/action hooks for optimal re-renders
+- Separated Selector Facade Pattern: Separated state/action hooks for optimal re-renders
 - Each store uses `persist` middleware with IndexedDB backend
 
 ### 2. **Persist Middleware** (`src/stores/root/persist-middleware.ts`)
@@ -503,6 +503,6 @@ it('should hydrate from IndexedDB', async () => {
 
 ## Related Documentation
 
-- [stores/README.md](../stores/README.md) - Store architecture and Pattern C pattern
+- [stores/README.md](../stores/README.md) - Store architecture and Separated Selector Facade Pattern
 - [ROADMAP.md](./ROADMAP.md) - Future schema migrations and sync protocol
 - [documentation/JOURNAL_REFACTOR_MIGRATION.md](./JOURNAL_REFACTOR_MIGRATION.md) - Component migration guide

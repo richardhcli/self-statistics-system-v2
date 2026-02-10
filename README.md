@@ -1,6 +1,7 @@
 # Journal & Graph AI: The Neural Second Brain
 
-Journal & Graph AI is a high-fidelity personal growth platform that transforms unstructured thoughts and voice recordings into a structured, hierarchical knowledge base. It leverages the **Google Gemini API** to classify human effort and visualizes progress through a stable **Directed Acyclic Graph (DAG)**.
+Journal & Graph AI is a high-fidelity personal growth platform that transforms unstructured thoughts (voice recordings) into experience and level updates representing current state, in order to create a status screen for the user. 
+It leverages the **Google Gemini API** to classify human effort and visualizes progress through a stable **Directed Acyclic Graph (DAG)**.
 
 Project URL: https://self-statistics-system-v1.web.app
 
@@ -34,7 +35,7 @@ Levels are computed via `Level = floor(log2(EXP + 1))`, providing rapid early le
 ## 🛠 Application Views
 
 ### 📔 Journal
-A hierarchical feed (Year > Month > Day) for voice and text ingestion. Features detailed "Neural Impact Analysis" for every entry, showing exactly where your effort went. Includes a **Canvas-based Oscilloscope** for real-time voice feedback during recording. Firebase is the source of truth; local IndexedDB provides fast boot and offline reads.
+A hierarchical feed (Year > Month > Day) for voice and text ingestion. Features detailed "status update" for every entry, showing exactly where your effort went. Includes a **Canvas-based Oscilloscope** for real-time voice feedback during recording. Firebase is the source of truth; local IndexedDB provides fast boot and offline reads.
 
 ### 🕸 Concept Graph (Visual Source of Truth)
 A stable, interactive DAG visualization designed for semantic clarity and structural persistence. Supports multi-node selection, relationship path highlighting, and **Ultra-Rigid position snapping** for a deterministic UX. Hydrates from IndexedDB on boot, then force-refreshes from Firebase.

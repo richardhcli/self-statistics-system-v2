@@ -40,5 +40,5 @@ The Neural Second Brain is built on a modern, high-performance stack designed fo
 - **Hybrid Read-Aside, Sync-Behind**: Firebase is the source of truth, while Zustand + IndexedDB provide cache-first reads with optimistic writes.
 - **Semantic Layering**: A hierarchical approach to data modeling that maps granular human tasks to abstract cognitive traits.
 - **Systems Architecture**: Pure domain logic (game math, progression rules) isolated in `src/systems/` — no React, no stores, no side-effects.
-- **Separated Selector Facade (Pattern C)**: All global stores expose state via fine-grained selector hooks and a single stable actions object.
+- **Separated Selector Facade Pattern**: All global stores expose state via fine-grained selector hooks and a single stable actions object.
 - **Orchestrator Pattern**: Cross-store business logic coordinated via custom hooks in `src/hooks/`.

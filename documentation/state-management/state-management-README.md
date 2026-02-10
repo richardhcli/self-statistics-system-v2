@@ -36,12 +36,12 @@ This project follows a **Hybrid Read-Aside** architecture where Firebase is the 
 ## Quick Decision Tree
 
 **Do I need state?**
-
-→ Is it used by multiple distant features **and** survives page refresh?  
-&nbsp;&nbsp;&nbsp;&nbsp;**YES** → Use Zustand store (see [GLOBAL_STATE.md](./GLOBAL_STATE.md))  
-&nbsp;&nbsp;&nbsp;&nbsp;**NO** → Is it used by adjacent components in the same feature?  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**YES** → Use local `useState` lifted to common parent  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**NO** → Use component-level `useState`
+→ Does it have to survives page refresh? use Firebase 
+→ Is it used by multiple distant features?  
+  **YES** → Use Zustand store (see [GLOBAL_STATE.md](./GLOBAL_STATE.md))  
+  **NO** → Is it used by adjacent components in the same feature?  
+    **YES** → Use local `useState` lifted to common parent  
+    **NO** → Use component-level `useState`
 
 ---
 

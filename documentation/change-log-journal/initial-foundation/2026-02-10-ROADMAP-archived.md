@@ -1,7 +1,11 @@
 # Persistence Roadmap: Future Schema Migrations & Sync
 
 **Date**: February 10, 2026  
-**Status**: Planned (Not Yet Implemented)  
+**Status**: OUT OF DATE. ~~Planned (Not Yet Implemented)~~
+Persist middleware is no longer as relevant. With read-aside architecture, the primary focus is syncing with the backend-- the backend always comes first. Caching is now unnecessary except as a more docs-read efficient method. 
+This document is obselete. Instead, always conform to firebase as truth for modifications. This is true for this web app specifically, because it will be a web UI, and NOT true for future desktop / mobile apps (those will be completely local focused). 
+
+
 **Priority**: Low (design document for Phase 2)
 
 MANY OF THESE CHANGES WILL SLOW DOWN DEVELOPMENT. 
@@ -122,7 +126,7 @@ if (version < 2) {
 }
 ```
 
-#### Pattern C: Transform Nested Structure
+#### Separated Selector Facade Pattern: Transform Nested Structure
 ```typescript
 if (version < 2) {
   return {

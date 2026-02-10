@@ -5,7 +5,7 @@ The `stores/` directory contains independent Zustand stores with **Pattern C** s
 
 ## 🏗 Store Architecture
 
-### Pattern C: State + Actions Separation
+### Separated Selector Facade Pattern: State + Actions Separation
 Each store exports two hooks:
 - **State Hook** (`useStore`): Returns read-only state. Use when you only need data.
 - **Actions Hook** (`useStoreActions`): Returns mutation functions. Use when you need to update state.

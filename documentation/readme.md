@@ -113,13 +113,12 @@ These represent enforceable standards and should not be modified without careful
 ### Descriptive Documents
 These provide context and guidance; updated as the project evolves:
 - `ai-guidelines.md` — AI agent reference
-- All feature docs, architecture overviews, and changelogs
+- All feature docs, architecture overviews, and current changelog
 
 ---
 
 ## 📌 How to Keep Documentation Accurate
 
-1. **After major refactors**: Update [ai-guidelines.md](../ai-guidelines.md) and relevant pattern docs
+1. **After major refactors**: Update [ai-guidelines.md](../ai-guidelines.md) and relevant pattern docs. Create a new refactor-specific changelog. 
 2. **After new features**: Update the relevant doc in [docs-features/](./docs-features/)
-3. **Significant changes**: Note in [CHANGELOG_SUMMARY.md](./CHANGELOG_SUMMARY.md)
-4. **Version releases**: Update [changelog.md](./changelog.md)
+4. **Version releases** / **Significant changes**: Update [changelog.md](./changelog.md)

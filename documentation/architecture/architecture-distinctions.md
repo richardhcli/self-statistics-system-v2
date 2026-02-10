@@ -28,7 +28,7 @@ The `/lib` folder contains the domain's "Soul"—the pure math, algorithms, and 
 The `/stores` folder manages how data is held in memory, persisted to disk, and updated.
 
 ### Core Responsibilities
-* **State Management**: Implements the **Separated Selector Facade Pattern** (Pattern C).
+* **State Management**: Implements the **Separated Selector Facade Pattern**.
 * **Persistence**: Configures `idb-keyval` and handles `partialize` to ensure only raw data is saved.
 * **Glue Logic**: Actions in this layer call `/lib` utilities to perform computations.
 
