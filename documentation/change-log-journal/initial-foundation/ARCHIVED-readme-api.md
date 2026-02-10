@@ -1,5 +1,7 @@
 # API Specification & Sync Strategy
 
+~January
+
 The system is designed with a **Local-First** philosophy. IndexedDB is the primary store, and the API layer serves as a synchronization bridge for fullstack integration.
 
 ## Centralized Sync strategy
