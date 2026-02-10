@@ -15,6 +15,8 @@ Create (Button color) Button:functionlity pairs:
 (red) Clear indexDB: remove all indexDB data. 
 (red) Clear global stores: removes all global stores data. 
 
+#### entry view upgrade: 
+- when journal entry is in transcribing state, remove ai analyze button. 
 
 #### profile picture: 
 update default picture in statistics -> information header to be profile pic. update debug view to show profile pic in component. 
@@ -26,13 +28,15 @@ Firestore does not enforce DAG constraints. You **must** verify that `targetId` 
 #### 2. Required Indexes
 
 To filter edges by source, target, or metadata, you must define indexes in `firestore.indexes.json`:
-
 * `edges`: `source` (Asc) + `weight` (Desc)
 * `edges`: `target` (Asc) + `metadata.type` (Asc)
 
 #### fix authentication glitches: 
 - authentication breaks if there is multiple tabs open for the same user. Fix this. 
+- use JWT authentication tokens - https://github.com/alan2207/bulletproof-react/security. 
 
+#### Implement webhooks plan and implementation: 
+- webhooks. to app and from app. test with obsidian. Using live app... 
 
 ---
 
