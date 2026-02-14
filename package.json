@@ -1,5 +1,5 @@
 {
-  "name": "journal-&-graph-ai-demo",
+  "name": "self-statistics-system-v2",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -14,7 +14,7 @@
   "dependencies": {
     "@google/genai": "^1.34.0",
     "d3": "^7.9.0",
-    "firebase": "^12.8.0",
+    "firebase": "^12.9.0",
     "idb-keyval": "^6.2.2",
     "lucide-react": "^0.562.0",
     "nanoid": "^5.1.6",

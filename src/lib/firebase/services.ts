@@ -10,14 +10,16 @@ import { getAnalytics } from "firebase/analytics";
  * is not a secret credential that needs hiding; access to data is controlled by Firebase Security Rules. 
 
  */
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBZiAMJrhBrtlkokgJKCVKHICHzmtpdMek",
-  authDomain: "self-statistics-system-v1.firebaseapp.com",
-  projectId: "self-statistics-system-v1",
-  storageBucket: "self-statistics-system-v1.firebasestorage.app",
-  messagingSenderId: "601138758715",
-  appId: "1:601138758715:web:2ffc0248482051777ac81e",
-  measurementId: "G-37SVGE4F5F"
+  apiKey: "AIzaSyBljfgY4PY2cxy3rYAzSAUYa2b4-PRF1TA",
+  authDomain: "self-statistics-system-v2.firebaseapp.com",
+  projectId: "self-statistics-system-v2",
+  storageBucket: "self-statistics-system-v2.firebasestorage.app",
+  messagingSenderId: "694246828476",
+  appId: "1:694246828476:web:564ea4550d8c6a68bca3b9",
+  measurementId: "G-CRN9HWE33Y"
 };
 
 

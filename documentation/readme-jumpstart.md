@@ -28,6 +28,6 @@ Open your web browser and navigate to the address shown in your terminal. It wil
 
 [http://localhost:3000](http://localhost:3000)
 
-You should now see the Journal & Graph AI application running in your browser.
+You should now see the self-statistics-system application running in your browser.
 
 

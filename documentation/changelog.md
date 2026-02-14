@@ -1,6 +1,6 @@
 # Changelog: Neural Second Brain Evolution
 
-This document tracks the iterative development of the Journal & Graph AI application.
+This document tracks the iterative development of the self-statistics-system.
 
 
 ## Phase 2: Development
@@ -8,6 +8,8 @@ Establishing the foundation for multi-device synchronization and persistent clou
 
 
 ## Phase 1: Demo
+
+### Finalization / debugging
 
 ### Gemini 3 hackathon submission: 
 Roughly at this point. 

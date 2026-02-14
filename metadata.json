@@ -1,5 +1,5 @@
 {
-  "name": "Journal & Graph AI Demo",
+  "name": "self-statistics-system-v2",
   "description": "A sophisticated journal application that uses Gemini AI to turn voice into structured entries and graph nodes, persisting everything in the browser via IndexedDB.",
   "requestFramePermissions": [
     "microphone"

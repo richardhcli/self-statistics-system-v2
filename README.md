@@ -1,6 +1,6 @@
-# Journal & Graph AI: The Neural Second Brain
+# self-statistics-system-v2: The Neural Second Brain
 
-Journal & Graph AI is a high-fidelity personal growth platform that transforms unstructured thoughts (voice recordings) into experience and level updates representing current state, in order to create a status screen for the user. 
+self statistics system is a high-fidelity personal growth platform that transforms unstructured thoughts (voice recordings) into experience and level updates representing current state, in order to create a status screen for the user. 
 It leverages the **Google Gemini API** to classify human effort and visualizes progress through a stable **Directed Acyclic Graph (DAG)**.
 
 Project URL: https://self-statistics-system-v1.web.app

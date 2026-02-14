@@ -5,7 +5,7 @@
 **Last Updated**: February 10, 2026  
 **Related**: [ai-guidelines.md](../../ai-guidelines.md), [architecture-lib-vs-stores.md](./architecture-lib-vs-stores.md)
 
-The Journal & Graph AI application is built following the **Bulletproof React** pattern, which prioritizes modularity, scalability, and clear separation of concerns.
+The self-statistics-system application is built following the **Bulletproof React** pattern, which prioritizes modularity, scalability, and clear separation of concerns.
 
 ## Hybrid Read-Aside Philosophy
 The application operates on a **Hybrid Read-Aside, Sync-Behind** basis, using Firebase as the Source of Truth and Zustand as a Smart Cache.
