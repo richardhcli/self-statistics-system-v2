@@ -1,23 +1,28 @@
 /**
  * Logout view component.
- * Provides a dedicated sign-out confirmation screen.
+ * Provides a dedicated sign-out confirmation screen with user-friendly UI.
+ * Uses the centralized logout helper from AuthProvider for consistent behavior.
  */
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { useAuth } from "@/providers/auth-provider";
 
 export const LogoutView: React.FC = () => {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
+  /**
+   * Handle sign-out action using centralized logout helper.
+   * The AuthProvider's observer will automatically update state to user: null.
+   */
   const handleSignOut = async () => {
     try {
       setError(null);
       setIsSigningOut(true);
-      await signOut(auth);
+      await logout();
       navigate("/auth/login", { replace: true });
     } catch (err) {
       console.error("[LogoutView] Sign-out failed", err);

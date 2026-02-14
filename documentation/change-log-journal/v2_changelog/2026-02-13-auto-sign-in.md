@@ -49,8 +49,12 @@ The Self-Statistics System v2 uses Firebase Authentication with **automatic sess
 #### 6. **useAuth Hook**
 - **Location:** [src/providers/auth-provider.tsx](src/providers/auth-provider.tsx)
 - **Status:** Complete
-- **Usage:** `const { user, loading, hasTimedOut } = useAuth();`
-- **Consumers:** Settings, Journal, Debug views, and Store sync hooks
+- **Usage:** `const { user, loading, hasTimedOut, logout } = useAuth();`
+- **Consumers:** Settings, Journal, Debug views, Store sync hooks, and Logout view
+- **Features:**
+  - Access to current user object
+  - Loading and timeout state tracking
+  - Centralized logout function for consistent sign-out behavior
 
 #### 7. **Global Store Synchronization**
 - **Location:** [src/hooks/use-global-store-sync.ts](src/hooks/use-global-store-sync.ts)
@@ -94,34 +98,36 @@ useGlobalStoreSync fetches Firebase data → populates Zustand stores
 
 ---
 
+## Completed Enhancements
+
+### ✅ Recent Additions (2026-02-13)
+
+1. **Centralized Logout Helper**
+   - **Status:** Complete
+   - **Implementation:** Added `logout()` function to [src/providers/auth-provider.tsx](src/providers/auth-provider.tsx)
+   - **Usage:** `const { logout } = useAuth(); await logout();`
+   - **Benefits:**
+     - Consistent error handling across all logout flows
+     - Single source of truth for sign-out logic
+     - Simplified component code (no need to import Firebase auth directly)
+   - **Refactored:** [src/features/auth/components/logout-view.tsx](src/features/auth/components/logout-view.tsx) now uses centralized helper
+
+2. **Auth Timeout Notification**
+   - **Status:** Complete
+   - **Implementation:** [src/features/auth/components/auth-view.tsx](src/features/auth/components/auth-view.tsx)
+   - **Behavior:** After 8 seconds without auth response, displays troubleshooting steps and reload button
+   - **Trigger:** `hasTimedOut` flag from AuthProvider
+
+---
+
 ## Outstanding Tasks
 
 ### 🔧 Optional Enhancements
 
-1. **Centralized Logout Helper (Optional)**
-   - Currently, logout is handled directly in `LogoutView` via `signOut(auth)`
-   - **Consider:** Adding a `logout()` function to `AuthContext` for reusability
-   - **Implementation:** Add to [src/providers/auth-provider.tsx](src/providers/auth-provider.tsx):
-     ```tsx
-     const logout = async () => {
-       try {
-         await signOut(auth);
-       } catch (error) {
-         console.error("[Auth] Sign-out failed", error);
-       }
-     };
-     ```
-     Then expose in context: `<AuthContext.Provider value={{ user, loading, hasTimedOut, logout }}>`
-
-2. **Verify Token Refresh Behavior**
+1. **Verify Token Refresh Behavior**
    - Firebase automatically refreshes tokens in the background
    - **Action:** Monitor console logs to confirm no token expiration issues occur during long sessions
    - **If issues arise:** May need to manually call `auth.currentUser?.getIdToken(true)` periodically
-
-3. **Auth Timeout Notification (Optional)**
-   - `hasTimedOut` flag is tracked but only displayed in Debug view
-   - **Consider:** Show a toast notification to the user if timeout occurs
-   - **Location to implement:** [src/features/auth/components/auth-view.tsx](src/features/auth/components/auth-view.tsx)
 
 ---
 
@@ -130,8 +136,9 @@ useGlobalStoreSync fetches Firebase data → populates Zustand stores
 - [ ] User can sign in with Google and session persists on refresh
 - [ ] User remains signed in after closing and reopening the browser
 - [x] Protected routes redirect to `/auth/login` when not authenticated
-- [ ] Logout clears session and redirects to login
+- [x] Logout clears session and redirects to login (centralized logout helper)
 - [ ] `useGlobalStoreSync` fetches user data after authentication
+- [x] Auth timeout notification displays after 8 seconds with troubleshooting steps
 - [ ] **Test:** Timeout edge case (slow network, Firebase SDK failure)
 - [ ] **Test:** Token refresh during multi-hour session
 
