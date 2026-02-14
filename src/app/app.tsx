@@ -15,14 +15,14 @@
 import React from "react";
 import { usePersistence } from "@/hooks/use-persistence";
 import { AppRoutes } from "./routes";
-import { clearIndexedDB } from "@/testing";
+import { clearIndexedDBConditional } from "@/testing";
 
 /**
  * TEMPORARY: Clear IndexedDB on app load (debugging hydration issues)
  * @deprecated Remove this after debugging is complete
  */
-console.warn("[App] Clearing IndexedDB for debugging purposes. Remove in final app.");
-clearIndexedDB().catch(console.error);
+// console.warn("[App] Clearing IndexedDB for debugging purposes. Remove in final app.");
+clearIndexedDBConditional().catch(console.error);
 
 const App: React.FC = () => {
   console.log("[App] Starting");
