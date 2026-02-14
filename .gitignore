@@ -30,3 +30,7 @@ dist-ssr
 
 # windows cmd script files
 .npmrc
+
+#firebase files
+.firebase
+.firebase/*
