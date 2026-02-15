@@ -3,7 +3,7 @@
 self statistics system is a high-fidelity personal growth platform that transforms unstructured thoughts (voice recordings) into experience and level updates representing current state, in order to create a status screen for the user. 
 It leverages the **Google Gemini API** to classify human effort and visualizes progress through a stable **Directed Acyclic Graph (DAG)**.
 
-Project URL: https://self-statistics-system-v1.web.app
+Project URL: https://self-statistics-system-v2.web.app
 
 ## 🚀 Core Philosophy & Mechanics
 
@@ -85,7 +85,7 @@ src/
 │   ├── visual-graph/ # D3-based concept graph visualization
 │   ├── developer-graph/ # Architectural graph editor
 │   ├── statistics/   # RPG character sheet (radar chart, level views)
-│   ├── settings/     # Discord-style settings interface
+│   ├── settings/     # settings interface
 │   ├── debug/        # Debug console + datastore tools
 │   ├── auth/         # Authentication UI
 │   ├── integration/  # Webhooks & Obsidian sync
