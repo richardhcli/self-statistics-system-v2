@@ -1,54 +1,54 @@
-### Finalized Implementation Blueprint: Async Job Pattern
+# Architecture Blueprint: Async Plugin System & Job Queue
 
-This blueprint integrates your decisions: **Dedicated Jobs Collection** (`users/{uid}/jobs`) and **External AI Microservice**.
+## 1. Executive Summary
+This blueprint defines the architecture for the **Self-Statistics System V2** backend. We are moving to an **Async Job Queue Pattern** to handle AI processing and third-party integrations (like Obsidian).
 
-**Phase 1: The Plugin SDK (The "Gatekeeper")**
+**Core Philosophy:**
+1.  **"Fire and Forget" API**: Client apps (Obsidian) submit data and get an immediate tracking ID (`jobId`). They do *not* wait for AI analysis.
+2.  **Plugin SDK**: A strict abstraction layer (`PluginSDK`) that standardizes how all plugins interact with Firestore (validating paths, managing schemas).
+3.  **Microservices**: AI logic is treated as an external service, even if currently mocked internally.
 
-* **Goal**: Provide a unified, safe API for all plugins.
-* **Structure**:
-* `journal`: CRUD for `users/{uid}/journal_entries`.
-* `graph`: CRUD for `users/{uid}/graphs`.
-* `settings`: Read/Write `users/{uid}/account_config`.
-* `user`: Read/Write `users/{uid}/user_information`.
-* `jobs`: Manage the new `users/{uid}/jobs` collection.
-
-
-
-**Phase 2: The AI Microservice (Mock)**
-
-* **Goal**: Create a standalone function that simulates the "External AI" service.
-* **Implementation**: A generic HTTP function that accepts a prompt and returns a mock analysis result after a delay.
-* **Location**: `src/microservices/ai-gateway.ts` (This represents the separate deployment).
-
-**Phase 3: The Job Manager System**
-
-* **Goal**: Handle the async lifecycle.
-* **Flow**:
-1. Plugin submits data → SDK creates "Queued" Job.
-2. Firestore Trigger (`onJobCreated`) wakes up.
-3. Trigger calls AI Microservice.
-4. Trigger updates Job to "Completed" with results.
-
-
-
-**Phase 4: Obsidian Plugin**
-
-* **Endpoints**:
-* `POST /submit`: Creates Journal Entry + Job. Returns `202 Accepted` + `jobId`.
-* `GET /status`: Checks Job status.
-
-
+Plugin structure: 
+- Each plugin will have utils (pure utilities), helpers (orchestrators), api (endpoints), and index (export api). Also, they will have "tests" for local python testbenches. 
 
 ---
 
-### Step 1: The Plugin SDK (`src/plugin-sdk/index.ts`)
+## 2. Directory Structure
+All backend logic resides in `functions/src/`.
 
-This is the **only** file your plugins are allowed to import for data access.
+```text
+functions/src/
+├── plugin-sdk/                  # CORE ABSTRACTION
+│   └── index.ts                 # The Universal CRUD Wrapper
+├── microservices/               # BACKEND SERVICES
+│   └── ai-gateway.ts            # Mocks external AI provider
+├── plugins/                     # FEATURE IMPLEMENTATIONS
+│   └── obsidian-integration/    # Integration: Obsidian
+│       ├── api.ts               # HTTP Endpoint (Ingest)
+│       ├── worker.ts            # Firestore Trigger (Process)
+│       ├── types.ts             # Plugin-specific Interfaces
+│       └── index.ts             # Export barrel
+└── index.ts                     # Main Registry
+```
+
+---
+
+## 3. Implementation Specifications
+
+### Phase 1: The Plugin SDK
+**File:** `functions/src/plugin-sdk/index.ts`
+
+The SDK creates a secure boundary for plugins, ensuring they only touch `users/{userId}/...` paths.
+
+**Responsibilities:**
+*   **Journal**: Create raw entries.
+*   **Jobs**: Enqueue background tasks (`queued` -> `processing` -> `completed`).
+*   **User**: Read/Update Gamification stats.
 
 ```typescript
 import * as admin from 'firebase-admin';
 
-// Ensure Admin SDK is initialized
+// Singleton Init
 if (!admin.apps.length) {
   admin.initializeApp();
 }
@@ -60,375 +60,271 @@ export class PluginSDK {
   constructor(userId: string) {
     this.userId = userId;
   }
-...
 
-```
+  // --- SUB-MODULES ---
 
-We will move away from hardcoded modules and instead create a Universal CRUD Engine that can access any datastore, with specific helpers for your known domains.
+  get journal() {
+    return {
+      create: async (content: string, metadata: any = {}) => {
+        const ref = db.collection(`users/${this.userId}/journal_entries`).doc();
+        const entry = {
+          id: ref.id,
+          content,
+          metadata,
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+          created_at_iso: new Date().toISOString()
+        };
+        await ref.set(entry);
+        return ref.id;
+      },
+      get: async (entryId: string) => {
+        const doc = await db.doc(`users/${this.userId}/journal_entries/${entryId}`).get();
+        return doc.exists ? doc.data() : null;
+      },
+      update: async (entryId: string, data: any) => {
+        await db.doc(`users/${this.userId}/journal_entries/${entryId}`).set(data, { merge: true });
+      }
+    };
+  }
 
-Action: Create src/plugin-sdk/index.ts
-This single file will export the PluginSDK class.
+  get jobs() {
+    return {
+      create: async (type: string, payload: any) => {
+        const ref = db.collection(`users/${this.userId}/jobs`).doc();
+        await ref.set({
+          id: ref.id,
+          type,
+          payload,
+          status: 'queued', // queued -> processing -> completed/failed
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          result: null,
+          errors: []
+        });
+        return ref.id;
+      },
+      get: async (jobId: string) => {
+        const doc = await db.doc(`users/${this.userId}/jobs/${jobId}`).get();
+        return doc.exists ? doc.data() : null;
+      },
+      updateStatus: async (jobId: string, status: 'processing' | 'completed' | 'failed', result: any = null) => {
+        const updateData: any = { status, updatedAt: admin.firestore.FieldValue.serverTimestamp() };
+        if (result) updateData.result = result;
+        await db.doc(`users/${this.userId}/jobs/${jobId}`).update(updateData);
+      }
+    };
+  }
 
-1. The Universal CRUD Layer
-This internal helper handles the raw Firestore operations. It is "private" to the SDK but exposed via controlled methods.
-
-```TypeScript
-// Conceptual Implementation
-private async crud(action: 'GET' | 'SET' | 'UPDATE' | 'DELETE', collectionPath: string, docId?: string, data?: any) {
-  const colRef = this.db.collection(`users/${this.userId}/${collectionPath}`);
-  // ... switch statement handling standard Firestore logic ...
+  get user() {
+    return {
+      updateStats: async (deltaExp: number) => {
+        const ref = db.doc(`users/${this.userId}/user_information/player_statistics`);
+        await db.runTransaction(async (t) => {
+            const doc = await t.get(ref);
+            const currentExp = doc.data()?.exp || 0;
+            t.set(ref, { exp: currentExp + deltaExp }, { merge: true });
+        });
+      }
+    };
+  }
 }
 ```
 
-#### 2. The Domain Helpers
+### Phase 2: Mock AI Microservice
+**File:** `functions/src/microservices/ai-gateway.ts`
 
-These are the friendly wrappers you will actually use.
-
-* **`journal`**:
-* `createEntry(text, metadata)`: Auto-generates ID (YYYYMMDD...), adds timestamps.
-* `getEntry(id)`
-
-
-* **`graph`**:
-* `getTopology()`: Fetches `graphs/cdag_topology`.
-* `updateNode(nodeId, data)`
-
-
-* **`user`**:
-* `getStats()`: Fetches `user_information/player_statistics`.
-* `updateStats(data)`: Merges data into player statistics.
-
-
-* **`jobs`** (The Async Engine):
-* `create(type, payload)`: Creates a job in `jobs/` collection.
-* `get(jobId)`: Checks status.
-* `updateStatus(jobId, status, result)`: Used by workers.
-
----
-
-### Step 2: The Mock AI Microservice (`src/microservices/ai-gateway.ts`)
-
-This represents the **separate** cloud function.
+Simulates an external heavyweight process.
 
 ```typescript
 import { onRequest } from "firebase-functions/v2/https";
 
-/**
- * TODO: Deploy this as a separate microservice.
- * URL: https://api.myservice.com/v1/analyze
- */
 export const aiGateway = onRequest(async (req, res) => {
-  // Simulate processing delay (e.g., calling OpenAI)
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  // Simulate 1.5s latency similar to OpenAI
+  await new Promise(r => setTimeout(r, 1500));
 
-  const { prompt, content } = req.body;
-
-  // Mock Response
   res.json({
-    success: true,
-    analysis: {
-      summary: `Analyzed: ${content.substring(0, 20)}...`,
-      sentiment: "positive",
-      suggestedTags: ["productivity", "obsidian"],
-      tokensUsed: 150
-    }
+    summary: "Automatically generated summary from AI.",
+    tags: ["auto-tag-1", "auto-tag-2"],
+    sentiment: "positive",
+    expReward: 50
   });
 });
-
 ```
 
----
+### Phase 3: Obsidian Integration Plugin
+**Folder:** `functions/src/plugins/obsidian-integration/`
 
-### Step 3: The Obsidian Plugin
-
-Location: src/plugins/obsidian-integration/
-
-
-### Phase 2: Obsidian Integration Plugin Blueprint
-
-This plugin serves as the bridge between your local Obsidian vault (or any external tool) and your Firebase backend.
-
-**Location:** `src/plugins/obsidian-integration/`
-
-#### Step 1: `api.ts` (The Public Interface)
-
-This file exports a single HTTPS Function `obsidianEntry` that handles two methods:
-
-* **POST (Submit Entry):**
-* **Input:** `{ "content": "My journal text", "duration": 300, "tags": ["coding"] }`
-* **Logic:**
-1. Auth Check (Header `x-user-id`).
-2. Call `SDK.journal.createEntry()` to save the raw text immediately.
-3. Call `SDK.jobs.create('ai_analysis_obsidian', { entryId })` to trigger the AI background worker.
-
-
-* **Response:** `202 Accepted` JSON containing `{ "jobId": "...", "statusUrl": "..." }`.
-
-
-* **GET (Check Status):**
-* **Input:** Query param `?jobId=...`
-* **Logic:** Call `SDK.jobs.get(jobId)`.
-* **Response:** JSON with current status (`queued`, `processing`, `completed`) and result if done.
-
-
-
-#### Step 2: `status-api.ts` (The Player Stats)
-
-A separate HTTPS Function `obsidianStatus` for fetching RPG stats.
-
-* **GET:**
-* **Logic:** Call `SDK.user.getStats()`.
-* **Response:** JSON `{ "level": 5, "exp": 1200, "attributes": { ... } }`.
-* **Use Case:** Your Obsidian dashboard can display your current "Game Level".
-
-
-
-#### Step 3: `worker.ts` (The Background Processor)
-
-A Firestore Trigger on `users/{uid}/jobs/{jobId}`.
-
-* **Trigger:** `onDocumentCreated`
-* **Logic:**
-1. Check if `job.type === 'ai_analysis_obsidian'`.
-2. Update Job Status → `processing`.
-3. **AI Simulation:**
-* Fetch the Journal Entry using `SDK.journal.getEntry(job.payload.entryId)`.
-* Send text to your **AI Microservice** (or mock function).
-* Receive analysis (tags, sentiment, EXP gained).
-
-
-4. **Apply Results:**
-* Update the Journal Entry with AI metadata (tags, summary).
-* Update Player Stats with gained EXP using `SDK.user.updateStats()`.
-
-
-5. Update Job Status → `completed` (with results).
-
-
-
----
-
-### Phase 3: Testing Plan
-
-1. **Local Test Script (`test_obsidian_flow.py`):**
-* **Test A:** POST a journal entry. Assert `202` response.
-* **Test B:** Loop/Poll the status URL. Assert status changes from `queued` → `completed`.
-* **Test C:** GET the `obsidianStatus` endpoint. Assert that EXP has increased (proving the worker updated the stats).
-
-
-
-#### 3a. Utils & Types (`utils.ts`)
-
-```typescript
-export interface ObsidianPayload {
-  content: string;
-  durationSeconds: number;
-}
-
-```
-
-#### 3b. The API (`api.ts`)
-
-This handles the User -> Backend HTTP request.
+#### A. The API (Ingest)
+**File:** `api.ts`
+Accepts volume, stores it safely, and offloads processing.
 
 ```typescript
 import { onRequest } from "firebase-functions/v2/https";
 import { PluginSDK } from "../../plugin-sdk";
 
 export const obsidianApi = onRequest(async (req, res) => {
-  // 1. Auth Check (Mock)
-  const userId = req.headers['x-user-id'] as string || 'default_user';
-  const sdk = new PluginSDK(userId);
+    // 1. Auth (Simple Header for MVP)
+    const userId = req.headers['x-user-id'] as string || 'default_user';
+    const sdk = new PluginSDK(userId);
 
-  if (req.method === 'POST') {
-    // --- SUBMIT FLOW ---
-    const { content, durationSeconds } = req.body;
+    // 2. Handle POST (Submit Entry)
+    if (req.method === 'POST') {
+        const { content, duration } = req.body;
+        
+        // A. Store Raw Data
+        const entryId = await sdk.journal.create(content, { duration });
 
-    try {
-      // A. Save the Raw Entry
-      const entryId = await sdk.journal.create(content, { duration: durationSeconds });
+        // B. Queue Background Job
+        const jobId = await sdk.jobs.create('ai_analysis_obsidian', { entryId });
 
-      // B. Create the Async Job
-      const jobId = await sdk.jobs.create('ai_analysis_obsidian', { 
-        entryId, 
-        content 
-      });
-
-      // C. Return 202 Accepted + Job ID
-      res.status(202).json({
-        message: "Entry accepted. Processing started.",
-        entryId,
-        jobId,
-        statusUrl: `/obsidianApi?action=poll&jobId=${jobId}`
-      });
-
-    } catch (e: any) {
-      res.status(500).json({ error: e.message });
+        // C. Fast Response
+        res.status(202).json({ 
+            success: true, 
+            entryId, 
+            jobId, 
+            message: "Entry stored. AI analysis queued." 
+        });
+        return;
     }
 
-  } else if (req.method === 'GET' && req.query.action === 'poll') {
-    // --- POLLING FLOW ---
-    const jobId = req.query.jobId as string;
-    const job = await sdk.jobs.get(jobId);
-    
-    if (!job) {
-      res.status(404).json({ error: "Job not found" });
-      return;
+    // 3. Handle GET (Check Job Status)
+    if (req.method === 'GET' && req.query.jobId) {
+        const job = await sdk.jobs.get(req.query.jobId as string);
+        if (!job) { res.status(404).send('Job not found'); return; }
+        res.json(job);
+        return;
     }
 
-    res.json(job);
-  }
+    res.status(405).send('Method Not Allowed');
 });
-
 ```
 
-#### 3c. The Worker (`worker.ts`)
-
-This is the Firestore Trigger that actually does the work.
+#### B. The Worker (Process)
+**File:** `worker.ts`
+Listens for new jobs and executes logic.
 
 ```typescript
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { PluginSDK } from "../../plugin-sdk";
-// In real life, use 'axios' or 'fetch' to call your AI Microservice
-// import axios from 'axios'; 
 
-export const obsidianWorker = onDocumentCreated(
-  "users/{userId}/jobs/{jobId}",
-  async (event) => {
-    const snapshot = event.data;
-    if (!snapshot) return;
+// Mock fetching the AI result (In prod, use axios/fetch to call ai-gateway)
+const mockAiCall = async (text: string) => {
+    return {
+        summary: `Analyzed: ${text.substring(0, 15)}...`,
+        tags: ["productivity", "obsidian"],
+        expReward: 100
+    };
+};
 
-    const job = snapshot.data();
-    const { userId, jobId } = event.params;
-    const sdk = new PluginSDK(userId);
+export const obsidianWorker = onDocumentCreated("users/{uid}/jobs/{jobId}", async (event) => {
+    const job = event.data?.data();
+    if (!job || job.type !== 'ai_analysis_obsidian' || job.status !== 'queued') return;
 
-    // Only process our specific job type
-    if (job.type !== 'ai_analysis_obsidian' || job.status !== 'queued') return;
+    const { uid, jobId } = event.params;
+    const sdk = new PluginSDK(uid);
 
     try {
-      // 1. Mark as Processing
-      await sdk.jobs.updateStatus(jobId, 'processing');
+        // 1. Mark Processing
+        await sdk.jobs.updateStatus(jobId, 'processing');
 
-      // 2. Call AI Microservice (Simulated)
-      // const response = await axios.post(AI_SERVICE_URL, { ... });
-      
-      // SIMULATION:
-      const mockResult = {
-        summary: "AI Analysis Complete",
-        tags: ["obsidian", "test"]
-      };
+        // 2. Fetch Source Data
+        const entry = await sdk.journal.get(job.payload.entryId);
+        if (!entry) throw new Error("Journal Entry not found");
 
-      // 3. Mark as Completed
-      await sdk.jobs.updateStatus(jobId, 'completed', mockResult);
+        // 3. Perform AI Logic
+        const aiResult = await mockAiCall(entry.content);
+
+        // 4. Apply Side Effects
+        // a. Update Journal
+        await sdk.journal.update(job.payload.entryId, { 
+            ai_analysis: aiResult,
+            tags: aiResult.tags 
+        });
+        // b. Award XP
+        await sdk.user.updateStats(aiResult.expReward);
+
+        // 5. Complete
+        await sdk.jobs.updateStatus(jobId, 'completed', aiResult);
 
     } catch (err: any) {
-      await sdk.jobs.updateStatus(jobId, 'failed', { error: err.message });
+        console.error(err);
+        await sdk.jobs.updateStatus(jobId, 'failed', { error: err.message });
     }
-  }
-);
-
+});
 ```
 
-#### 3d. Index (`index.ts`)
-
+#### C. Export
+**File:** `index.ts`
 ```typescript
 export { obsidianApi } from './api';
 export { obsidianWorker } from './worker';
-
 ```
 
 ---
 
-### Step 4: Register Everything (`src/index.ts`)
+## 4. Main Registry
+**File:** `functions/src/index.ts`
+
+Registers the new namespaces.
 
 ```typescript
-// 1. Testing
-export { helloWorld } from './testing/hello-world';
-export { debugEndpoint } from './testing/debug-api'; // If you kept this
+import { setGlobalOptions } from "firebase-functions";
 
-// 2. Microservices (Mock)
+setGlobalOptions({ maxInstances: 10 });
+
+// Existing Exports (Preserve these)
+export { externalWebhook } from './modules/bare-metal-api';
+export { onJournalEntryCreated } from './modules/voice-processor';
+export { debugEndpoint, helloWorld } from './testing';
+
+// New Microservices
 export { aiGateway } from './microservices/ai-gateway';
 
-// 3. Plugins
-export * as obsidian from './plugins/obsidian-incremental-system';
-
+// New Plugin Systems
+export * as obsidian from './plugins/obsidian-integration';
 ```
 
 ---
 
-### Step 5: The Test Script (`testing-obsidian.py`)
+## 5. Verification Plan
 
-This Python script verifies the entire "Job Queue" flow.
+### Test Script (`testing/testing-backend/test-obsidian.py`)
+Run this against the Emulator to verify the pipeline.
 
 ```python
-import requests
-import time
-import json
+import requests, time, sys
 
-# CONFIG
-PROJECT_ID = "demo-project" # Change if needed
-REGION = "us-central1"
-BASE_URL = f"http://127.0.0.1:5001/{PROJECT_ID}/{REGION}"
-OBSIDIAN_URL = f"{BASE_URL}/obsidian-obsidianApi" # Note the export name!
+# Verify Emulator URL
+BASE_URL = "http://127.0.0.1:5001/demo-project/us-central1"
+URL = f"{BASE_URL}/obsidian-obsidianApi"
 
-def run_test():
-    print(f"🚀 Testing Obsidian Plugin Flow: {OBSIDIAN_URL}")
-
-    # 1. SUBMIT ENTRY
-    payload = {
-        "content": "Today I refactored the backend to use an async job queue.",
-        "durationSeconds": 300
-    }
-    headers = { "x-user-id": "richard_li", "Content-Type": "application/json" }
-
-    print("Step 1: Submitting Journal Entry...")
-    resp = requests.post(OBSIDIAN_URL, json=payload, headers=headers)
+def run():
+    print(f"🚀 Testing Pipeline: {URL}")
     
-    if resp.status_code != 202:
-        print(f"❌ Failed to submit: {resp.text}")
-        return
-
-    data = resp.json()
+    # 1. Submit
+    print(">> Submitting Entry...")
+    res = requests.post(URL, json={"content": "Architecture test.", "duration": 60}, headers={"x-user-id": "richard_li"})
+    if res.status_code != 202: 
+        print(f"❌ Failed: {res.text}"); sys.exit(1)
+        
+    data = res.json()
     job_id = data['jobId']
-    print(f"✅ Accepted! Job ID: {job_id}")
+    print(f"✅ Job Queued: {job_id}")
 
-    # 2. POLL FOR COMPLETION
-    print("Step 2: Polling for results...")
-    status = "queued"
-    
-    for i in range(10): # Try 10 times
-        time.sleep(1) # Wait 1 second
-        poll_resp = requests.get(OBSIDIAN_URL, params={"action": "poll", "jobId": job_id}, headers=headers)
-        job_data = poll_resp.json()
-        status = job_data.get('status')
-        
-        print(f"   Attempt {i+1}: Status = {status}")
-        
-        if status == 'completed':
-            print("✅ Job Completed!")
-            print("Result:", json.dumps(job_data.get('result'), indent=2))
-            break
+    # 2. Poll for Completion
+    print(">> Polling Worker...", end="", flush=True)
+    for _ in range(10):
+        time.sleep(1)
+        status_res = requests.get(URL, params={"jobId": job_id}, headers={"x-user-id": "richard_li"})
+        state = status_res.json().get('status')
+        print(f".{state}", end="", flush=True)
+        if state == 'completed':
+            print("\n✅ WORKER SUCCESS!")
+            print(status_res.json().get('result'))
+            return
             
-    if status != 'completed':
-        print("❌ Timed out waiting for job completion.")
+    print("\n❌ Timeout: Worker did not complete job.")
 
 if __name__ == "__main__":
-    run_test()
-
+    run()
 ```
-
-
-
-
-
-
-
-## Execution Checklist
-
-1. [ ] **Refactor SDK:** Create `src/plugin-sdk/index.ts` with Universal CRUD.
-2. [ ] **Create Plugin:** Set up `src/plugins/obsidian-integration/` structure.
-3. [ ] **Implement API:** Write `api.ts` and `status-api.ts`.
-4. [ ] **Implement Worker:** Write `worker.ts`.
-5. [ ] **Register Exports:** Update `src/index.ts` to export the new functions.
-6. [ ] **Verify:** Run the Python test script against the Emulator.
 
