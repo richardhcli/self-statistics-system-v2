@@ -6,6 +6,12 @@ This document tracks the iterative development of the self-statistics-system.
 ## Phase 2: Development
 Establishing the foundation for multi-device synchronization and persistent cloud storage.
 
+### [v2.0.1] - plugin ecosystem
+- **Plugin SDK**: Created a constrained Firestore access layer (`PluginSDK`) that ensures plugins can only touch user-scoped collections. See [functions/src/plugin-sdk/index.ts](functions/src/plugin-sdk/index.ts).
+- **Async Job Queue**: Introduced a job lifecycle system (queued → processing → completed/failed) for async integrations, stored in `users/{uid}/jobs`.
+- **Obsidian Integration**: Implemented HTTPS ingest endpoint plus Firestore-triggered worker for journal ingestion, AI tagging, and XP updates. See [functions/src/plugins/obsidian-integration/](functions/src/plugins/obsidian-integration/).
+- **Mock AI Gateway**: Added a mock microservice endpoint to simulate external AI provider latency. See [functions/src/microservices/ai-gateway.ts](functions/src/microservices/ai-gateway.ts).
+- **Test Harness**: Added Python polling script for emulator verification. See [testing/testing-backend/test-obsidian.py](testing/testing-backend/test-obsidian.py).
 
 ## Phase 1: Demo
 

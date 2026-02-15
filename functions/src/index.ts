@@ -30,5 +30,10 @@ setGlobalOptions({ maxInstances: 10 });
 
 
 export { externalWebhook } from './modules/bare-metal-api';
-export { onJournalEntryCreated } from './modules/voice-processor';
 export { debugEndpoint, helloWorld } from './testing';
+
+// Microservices
+export { aiGateway } from './microservices/ai-gateway';
+
+// Plugins
+export * as obsidian from './plugins/obsidian-integration';
