@@ -16,8 +16,9 @@ Authentication is handled via Firebase Authentication with Google and Anonymous 
 
 ### Auth State Management
 - **Provider**: [src/providers/auth-provider.tsx](../../src/providers/auth-provider.tsx)
-- **Access Hook**: `useAuth()` returns `{ user, loading, hasTimedOut }`
+- **Access Hook**: `useAuth()` returns `{ user, loading, hasTimedOut, logout }`
 - **Observer**: `onAuthStateChanged(auth, ...)` tracks authentication state
+- **Logout**: Centralized `logout()` function ensures consistent sign-out behavior
 
 ### Intended Causal Flow
 1. User visits `/auth/login` and sees [AuthView](../../src/features/auth/components/auth-view.tsx).
@@ -110,7 +111,7 @@ Inline banner shown for guest users:
 
 **Location**: [src/features/auth/components/logout-view.tsx](../../src/features/auth/components/logout-view.tsx)
 
-Provides a dedicated sign-out screen with confirmation.
+Dedicated sign-out screen using centralized `logout()` helper from AuthProvider for consistent error handling.
 
 ### Firebase Config
 **Location**: [src/lib/firebase/services.ts](../../src/lib/firebase/services.ts)

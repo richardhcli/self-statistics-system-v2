@@ -133,11 +133,11 @@ useGlobalStoreSync fetches Firebase data → populates Zustand stores
 
 ## Testing Checklist
 
-- [ ] User can sign in with Google and session persists on refresh
-- [ ] User remains signed in after closing and reopening the browser
+- [x] User can sign in with Google and session persists on refresh
+- [x] User remains signed in after closing and reopening the browser
 - [x] Protected routes redirect to `/auth/login` when not authenticated
 - [x] Logout clears session and redirects to login (centralized logout helper)
-- [ ] `useGlobalStoreSync` fetches user data after authentication
+- [x] `useGlobalStoreSync` fetches user data after authentication
 - [x] Auth timeout notification displays after 8 seconds with troubleshooting steps
 - [ ] **Test:** Timeout edge case (slow network, Firebase SDK failure)
 - [ ] **Test:** Token refresh during multi-hour session
