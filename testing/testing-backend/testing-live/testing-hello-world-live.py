@@ -3,11 +3,12 @@ import json
 
 # --- CONFIGURATION ---
 # REPLACE THIS with your actual Firebase Project ID (found in .firebaserc)
-PROJECT_ID = "YOUR_REAL_PROJECT_ID" 
+PROJECT_ID = "self-statistics-system-v2" 
 REGION = "us-central1"
 FUNCTION_NAME = "helloWorld"
 
 # Live URL Structure: https://<region>-<project>.cloudfunctions.net/<function>
+#https://us-central1-self-statistics-system-v2.cloudfunctions.net/helloWorld
 URL = f"https://{REGION}-{PROJECT_ID}.cloudfunctions.net/{FUNCTION_NAME}"
 
 def run_test():
