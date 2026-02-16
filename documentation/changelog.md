@@ -6,6 +6,12 @@ This document tracks the iterative development of the self-statistics-system.
 ## Phase 2: Development
 Establishing the foundation for multi-device synchronization and persistent cloud storage.
 
+### [v2.0.2] - Obsidian pipeline hardening
+- **Emulator Parity**: Replaced legacy `FieldValue.serverTimestamp()` usage with `Timestamp.now()` to fix Firestore writes on the emulator. See [functions/src/plugin-sdk/index.ts](functions/src/plugin-sdk/index.ts).
+- **Resilient HTTPS Ingest**: Wrapped Obsidian ingest endpoint in structured `try/catch`, surfacing JSON errors instead of silent 500s. See [functions/src/plugins/obsidian-integration/api.ts](functions/src/plugins/obsidian-integration/api.ts).
+- **Green E2E Harness**: Emulator polling script now passes end-to-end for submit → queue → AI tagging → XP update. See [testing/testing-backend/testing-emulator/test-obsidian.py](testing/testing-backend/testing-emulator/test-obsidian.py).
+- **Documentation**: Added Functions runbook and plugin style guide for future integrations. See [documentation/backend/functions/firebase-functions.md](documentation/backend/functions/firebase-functions.md) and [documentation/backend/functions/plugins-style-guide.md](documentation/backend/functions/plugins-style-guide.md).
+
 ### [v2.0.1] - plugin ecosystem
 - **Plugin SDK**: Created a constrained Firestore access layer (`PluginSDK`) that ensures plugins can only touch user-scoped collections. See [functions/src/plugin-sdk/index.ts](functions/src/plugin-sdk/index.ts).
 - **Async Job Queue**: Introduced a job lifecycle system (queued → processing → completed/failed) for async integrations, stored in `users/{uid}/jobs`.
