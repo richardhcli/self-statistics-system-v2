@@ -5,8 +5,8 @@ from typing import Any, Dict
 
 import requests
 
-BASE_URL = "http://127.0.0.1:5001/demo-project/us-central1"
-ENDPOINT = f"{BASE_URL}/obsidian-obsidianApi"
+BASE_URL = "http://127.0.0.1:5001/self-statistics-system-v2/us-central1"
+ENDPOINT = f"{BASE_URL}/obsidianApi"
 HEADERS = {"x-user-id": "richard_li", "Content-Type": "application/json"}
 
 

@@ -14,8 +14,8 @@
 //     const params = event.params;
 
 //     // Safety check: if the document was deleted, snapshot is undefined
-//     if (!snapshot) { 
-//         return; 
+//     if (!snapshot) {
+//         return;
 //     }
 
 //     const data = snapshot.data(); // This retrieves the actual fields
@@ -24,12 +24,12 @@
 //     // Only process if it needs analysis
 //     if (data && data.needsAnalysis === true) {
 //       logger.info(`Analyzing entry for user ${userId}...`);
-      
+
 //       // ... (Rest of your logic remains the same) ...
-//       const extractedExp = 50; 
-      
+//       const extractedExp = 50;
+
 //       await sdk.stats.updateExp(userId, 'voice-node-1', extractedExp);
-      
+
 //       // Update the doc to prevent infinite loops
 //       await snapshot.ref.update({ needsAnalysis: false });
 //     }

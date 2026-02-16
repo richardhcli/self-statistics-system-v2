@@ -1,2 +1,2 @@
-export { obsidianApi } from './api';
-export { obsidianWorker } from './worker';
+export {obsidianApi} from "./api";
+export {obsidianWorker} from "./worker";

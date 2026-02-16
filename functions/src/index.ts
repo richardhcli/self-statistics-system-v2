@@ -24,16 +24,16 @@ import {setGlobalOptions} from "firebase-functions";
 // functions should each use functions.runWith({ maxInstances: 10 }) instead.
 // In the v1 API, each function can only serve one request per container, so
 // this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+setGlobalOptions({maxInstances: 10});
 
 
-
-
-export { externalWebhook } from './modules/bare-metal-api';
-export { debugEndpoint, helloWorld } from './testing';
+export {externalWebhook} from "./modules/bare-metal-api";
+export {debugEndpoint, helloWorld} from "./testing";
 
 // Microservices
-export { aiGateway } from './microservices/ai-gateway';
+export {aiGateway} from "./microservices/ai-gateway";
 
 // Plugins
-export * as obsidian from './plugins/obsidian-integration';
+export * as obsidian from "./plugins/obsidian-integration";
+export {obsidianApi} from "./plugins/obsidian-integration/api";
+export {obsidianWorker} from "./plugins/obsidian-integration/worker";

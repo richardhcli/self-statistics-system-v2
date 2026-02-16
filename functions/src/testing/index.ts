@@ -1,2 +1,2 @@
-export {debugEndpoint} from './debug-api';
-export {helloWorld} from './hello-world';
+export {debugEndpoint} from "./debug-api";
+export {helloWorld} from "./hello-world";

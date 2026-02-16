@@ -25,9 +25,10 @@ module.exports = {
     "@typescript-eslint",
     "import",
   ],
-  rules: {
+  rules: { // https://stackoverflow.com/questions/65606902/did-firebase-cloud-functions-eslint-change-recently
     "quotes": ["error", "double"],
     "import/no-unresolved": 0,
-    "indent": ["error", 2],
+    "indent": ["off"], // "error", 2
+    "max-len": ["off"],
   },
 };

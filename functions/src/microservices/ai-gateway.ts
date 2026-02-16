@@ -1,4 +1,4 @@
-import { onRequest } from 'firebase-functions/v2/https';
+import {onRequest} from "firebase-functions/v2/https";
 
 /**
  * Mock external AI processing endpoint.
@@ -9,9 +9,9 @@ export const aiGateway = onRequest(async (_req, res) => {
   await new Promise((resolve) => setTimeout(resolve, 1500));
 
   res.json({
-    summary: 'Automatically generated summary from AI.',
-    tags: ['auto-tag-1', 'auto-tag-2'],
-    sentiment: 'positive',
+    summary: "Automatically generated summary from AI.",
+    tags: ["auto-tag-1", "auto-tag-2"],
+    sentiment: "positive",
     expReward: 50,
   });
 });

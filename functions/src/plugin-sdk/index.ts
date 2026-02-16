@@ -1,9 +1,9 @@
-import * as admin from 'firebase-admin';
+import * as admin from "firebase-admin";
 
 /**
  * Allowed job lifecycle states.
  */
-type JobStatus = 'queued' | 'processing' | 'completed' | 'failed';
+type JobStatus = "queued" | "processing" | "completed" | "failed";
 
 /**
  * Persisted shape of a job document under users/{uid}/jobs/{jobId}.
@@ -27,6 +27,10 @@ export class PluginSDK {
   private readonly userId: string;
   private readonly db: admin.firestore.Firestore;
 
+  /**
+   * Construct a plugin-scoped Firestore helper.
+   * @param {string} userId user identifier scope
+   */
   constructor(userId: string) {
     if (!admin.apps.length) {
       admin.initializeApp();
@@ -40,7 +44,11 @@ export class PluginSDK {
    */
   get journal() {
     return {
-      /** Create a raw journal entry document. */
+      /**
+       * Create a raw journal entry document.
+      * @param {string} content raw journal text
+      * @param {Record<string, unknown>} metadata optional metadata to merge
+       */
       create: async (content: string, metadata: Record<string, unknown> = {}) => {
         const ref = this.db
           .collection(`users/${this.userId}/journal_entries`)
@@ -58,7 +66,10 @@ export class PluginSDK {
         return ref.id;
       },
 
-      /** Fetch a journal entry document by id. */
+      /**
+       * Fetch a journal entry document by id.
+      * @param {string} entryId journal document id
+       */
       get: async (entryId: string) => {
         const doc = await this.db
           .doc(`users/${this.userId}/journal_entries/${entryId}`)
@@ -67,11 +78,15 @@ export class PluginSDK {
         return doc.exists ? doc.data() : null;
       },
 
-      /** Merge updates into an existing journal entry document. */
+      /**
+       * Merge updates into an existing journal entry document.
+      * @param {string} entryId journal document id
+      * @param {Record<string, unknown>} data partial entry fields to merge
+       */
       update: async (entryId: string, data: Record<string, unknown>) => {
         await this.db
           .doc(`users/${this.userId}/journal_entries/${entryId}`)
-          .set(data, { merge: true });
+          .set(data, {merge: true});
       },
     };
   }
@@ -81,7 +96,11 @@ export class PluginSDK {
    */
   get jobs() {
     return {
-      /** Create a queued job. */
+      /**
+       * Create a queued job.
+      * @param {string} type job type identifier
+      * @param {Record<string, unknown>} payload job payload
+       */
       create: async (type: string, payload: Record<string, unknown>) => {
         const ref = this.db.collection(`users/${this.userId}/jobs`).doc();
 
@@ -89,7 +108,7 @@ export class PluginSDK {
           id: ref.id,
           type,
           payload,
-          status: 'queued',
+          status: "queued",
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
           result: null,
           errors: [],
@@ -99,7 +118,10 @@ export class PluginSDK {
         return ref.id;
       },
 
-      /** Fetch a job by id. */
+      /**
+       * Fetch a job by id.
+      * @param {string} jobId job document id
+       */
       get: async (jobId: string) => {
         const doc = await this.db
           .doc(`users/${this.userId}/jobs/${jobId}`)
@@ -108,7 +130,12 @@ export class PluginSDK {
         return doc.exists ? doc.data() : null;
       },
 
-      /** Update a job's status and optional result payload. */
+      /**
+       * Update a job's status and optional result payload.
+      * @param {string} jobId job document id
+      * @param {JobStatus} status new job status
+      * @param {Record<string, unknown>|null} result optional result payload
+       */
       updateStatus: async (
         jobId: string,
         status: JobStatus,
@@ -138,6 +165,10 @@ export class PluginSDK {
       /**
        * Increment player experience points.
        */
+      /**
+       * Increment player experience points.
+      * @param {number} deltaExp exp delta to apply
+       */
       updateStats: async (deltaExp: number) => {
         const ref = this.db.doc(`users/${this.userId}/user_information/player_statistics`);
 
@@ -145,7 +176,7 @@ export class PluginSDK {
           const snapshot = await transaction.get(ref);
           const currentExp = (snapshot.data()?.exp as number | undefined) ?? 0;
 
-          transaction.set(ref, { exp: currentExp + deltaExp }, { merge: true });
+          transaction.set(ref, {exp: currentExp + deltaExp}, {merge: true});
         });
       },
 
