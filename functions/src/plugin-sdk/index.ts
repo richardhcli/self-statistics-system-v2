@@ -1,4 +1,7 @@
 import * as admin from "firebase-admin";
+import {Timestamp} from "firebase-admin/firestore";
+
+const serverTimestamp = (): Timestamp => Timestamp.now();
 
 /**
  * Allowed job lifecycle states.
@@ -13,8 +16,8 @@ interface JobRecord {
   type: string;
   payload: Record<string, unknown>;
   status: JobStatus;
-  createdAt: admin.firestore.FieldValue;
-  updatedAt?: admin.firestore.FieldValue;
+  createdAt: Timestamp;
+  updatedAt?: Timestamp;
   result: Record<string, unknown> | null;
   errors: string[];
 }
@@ -58,7 +61,7 @@ export class PluginSDK {
           id: ref.id,
           content,
           metadata,
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          createdAt: serverTimestamp(),
           createdAtIso: new Date().toISOString(),
         };
 
@@ -109,7 +112,7 @@ export class PluginSDK {
           type,
           payload,
           status: "queued",
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          createdAt: serverTimestamp(),
           result: null,
           errors: [],
         };
@@ -143,7 +146,7 @@ export class PluginSDK {
       ) => {
         const update: Partial<JobRecord> = {
           status,
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: serverTimestamp(),
         };
 
         if (result) {
