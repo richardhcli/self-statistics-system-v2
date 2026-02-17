@@ -17,6 +17,7 @@ Establishing the foundation for multi-device synchronization and persistent clou
 - **Graph Upserts**: Shared graph writer keeps `progression` rooted manifests in sync while adding nodes/edges from AI output. See [functions/src/services/graph-writer.ts](functions/src/services/graph-writer.ts).
 - **AI Client**: Centralized HTTP client for the AI gateway with emulator awareness. See [functions/src/services/ai-client.ts](functions/src/services/ai-client.ts).
 - **Tests**: Added a TypeScript harness mirroring the Obsidian polling test. See [testing/testing-backend/testing-emulator/test-obsidian.ts](testing/testing-backend/testing-emulator/test-obsidian.ts).
+- **aiGateway Upgrade**: Uses the same single-prompt topology methodology as the client, backed by Gemini. Requires `GOOGLE_API_KEY` when hitting the live model. See [functions/src/microservices/ai-gateway.ts](functions/src/microservices/ai-gateway.ts).
 
 ### [v2.0.1] - plugin ecosystem
 - **Plugin SDK**: Created a constrained Firestore access layer (`PluginSDK`) that ensures plugins can only touch user-scoped collections. See [functions/src/plugin-sdk/index.ts](functions/src/plugin-sdk/index.ts).

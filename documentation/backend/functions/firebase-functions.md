@@ -14,7 +14,7 @@
 ## Function Inventory
 - **obsidianApi**: HTTPS ingest endpoint that stores journal content and enqueues `jobs` via `PluginSDK`. See [functions/src/plugins/obsidian-integration/api.ts](functions/src/plugins/obsidian-integration/api.ts).
 - **obsidianWorker**: Firestore trigger on `users/{uid}/jobs/{jobId}` that marks jobs processing, calls AI gateway, tags the source journal entry, and updates XP. See [functions/src/plugins/obsidian-integration/worker.ts](functions/src/plugins/obsidian-integration/worker.ts).
-- **aiGateway**: Mock microservice to simulate external AI latency/results. See [functions/src/microservices/ai-gateway.ts](functions/src/microservices/ai-gateway.ts).
+- **aiGateway**: Single-prompt topology generator (Gemini) that powers journal/Obsidian analysis. Requires `GOOGLE_API_KEY` env when running outside the mock. See [functions/src/microservices/ai-gateway.ts](functions/src/microservices/ai-gateway.ts).
 - **journalPipeline**: Synchronous journal ingest → AI analysis → graph and XP updates in a single HTTPS call. See [functions/src/plugins/journal-pipeline/api.ts](functions/src/plugins/journal-pipeline/api.ts).
 
 ## Local Development
