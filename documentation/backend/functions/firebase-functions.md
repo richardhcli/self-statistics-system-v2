@@ -15,6 +15,7 @@
 - **obsidianApi**: HTTPS ingest endpoint that stores journal content and enqueues `jobs` via `PluginSDK`. See [functions/src/plugins/obsidian-integration/api.ts](functions/src/plugins/obsidian-integration/api.ts).
 - **obsidianWorker**: Firestore trigger on `users/{uid}/jobs/{jobId}` that marks jobs processing, calls AI gateway, tags the source journal entry, and updates XP. See [functions/src/plugins/obsidian-integration/worker.ts](functions/src/plugins/obsidian-integration/worker.ts).
 - **aiGateway**: Mock microservice to simulate external AI latency/results. See [functions/src/microservices/ai-gateway.ts](functions/src/microservices/ai-gateway.ts).
+- **journalPipeline**: Synchronous journal ingest → AI analysis → graph and XP updates in a single HTTPS call. See [functions/src/plugins/journal-pipeline/api.ts](functions/src/plugins/journal-pipeline/api.ts).
 
 ## Local Development
 - Prereqs: Node.js, Java (for Firestore emulator), Firebase CLI.
@@ -40,4 +41,5 @@
 - All Firestore paths must be user-namespaced; avoid admin-wide reads.
 
 ## Testing
-- End-to-end emulator test: run [testing/testing-backend/testing-emulator/test-obsidian.py](testing/testing-backend/testing-emulator/test-obsidian.py) after starting the emulators. The script submits content, polls for job completion, and asserts AI tagging/XP updates.
+- End-to-end emulator (job queue): run [testing/testing-backend/testing-emulator/test-obsidian.py](testing/testing-backend/testing-emulator/test-obsidian.py) after starting the emulators. The script submits content, polls for job completion, and asserts AI tagging/XP updates.
+- TypeScript harness: run [testing/testing-backend/testing-emulator/test-obsidian.ts](testing/testing-backend/testing-emulator/test-obsidian.ts) for the same workflow using native fetch.

@@ -21,6 +21,7 @@
 - Journals: `users/{uid}/journal_entries/{entryId}` with `createdAt` as `Timestamp.now()` plus ISO string for debugging.
 - Jobs: `users/{uid}/jobs/{jobId}` with `status ∈ {queued, processing, completed, failed}`, `payload`, `result`, `errors`, and timestamps.
 - User stats: `users/{uid}/user_information/player_statistics` for XP updates; mutate via the SDK helper to ensure transactions.
+- Graphs: `users/{uid}/graphs/cdag_topology` with `nodes`, `edges`, and `graph_metadata/topology_manifest` for adjacency + summaries. Always keep the `progression` root and update manifest metrics when adding edges.
 
 ## Job Lifecycle Rules
 1. Ingest surface stores the source document and enqueues a job with `status=queued`.
@@ -34,5 +35,6 @@
 
 ## Testing Expectations
 - Local: run the Firestore/Functions emulator and execute [testing/testing-backend/testing-emulator/test-obsidian.py](testing/testing-backend/testing-emulator/test-obsidian.py) to verify submit → queue → completion.
+- For synchronous pipelines (e.g., `journalPipeline`), prefer deterministic AI mocks and add a TypeScript harness (see [testing/testing-backend/testing-emulator/test-obsidian.ts](testing/testing-backend/testing-emulator/test-obsidian.ts)).
 - Add a polling harness for every new plugin that validates both ingest and worker behavior.
 - Keep mock services (e.g., AI gateway) deterministic enough for repeatable CI runs.

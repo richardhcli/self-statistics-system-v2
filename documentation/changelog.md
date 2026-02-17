@@ -12,6 +12,12 @@ Establishing the foundation for multi-device synchronization and persistent clou
 - **Green E2E Harness**: Emulator polling script now passes end-to-end for submit → queue → AI tagging → XP update. See [testing/testing-backend/testing-emulator/test-obsidian.py](testing/testing-backend/testing-emulator/test-obsidian.py).
 - **Documentation**: Added Functions runbook and plugin style guide for future integrations. See [documentation/backend/functions/firebase-functions.md](documentation/backend/functions/firebase-functions.md) and [documentation/backend/functions/plugins-style-guide.md](documentation/backend/functions/plugins-style-guide.md).
 
+### [v2.0.3] - Synchronous journal pipeline
+- **journalPipeline**: New HTTPS endpoint that ingests a journal entry, calls the AI gateway, updates graph topology and XP, and returns the result in one call. See [functions/src/plugins/journal-pipeline/api.ts](functions/src/plugins/journal-pipeline/api.ts).
+- **Graph Upserts**: Shared graph writer keeps `progression` rooted manifests in sync while adding nodes/edges from AI output. See [functions/src/services/graph-writer.ts](functions/src/services/graph-writer.ts).
+- **AI Client**: Centralized HTTP client for the AI gateway with emulator awareness. See [functions/src/services/ai-client.ts](functions/src/services/ai-client.ts).
+- **Tests**: Added a TypeScript harness mirroring the Obsidian polling test. See [testing/testing-backend/testing-emulator/test-obsidian.ts](testing/testing-backend/testing-emulator/test-obsidian.ts).
+
 ### [v2.0.1] - plugin ecosystem
 - **Plugin SDK**: Created a constrained Firestore access layer (`PluginSDK`) that ensures plugins can only touch user-scoped collections. See [functions/src/plugin-sdk/index.ts](functions/src/plugin-sdk/index.ts).
 - **Async Job Queue**: Introduced a job lifecycle system (queued → processing → completed/failed) for async integrations, stored in `users/{uid}/jobs`.
