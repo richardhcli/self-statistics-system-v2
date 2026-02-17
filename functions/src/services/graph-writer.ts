@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import {Timestamp} from "firebase-admin/firestore";
 
 export type GraphNodeType = "action" | "skill" | "characteristic";
 
@@ -100,11 +101,25 @@ const recomputeManifestMetrics = (manifest: ManifestDocument) => {
   manifest.metrics = {nodeCount, edgeCount};
 };
 
+const sanitizeNodes = (nodes: GraphNode[]): GraphNode[] =>
+  nodes
+    .filter((node) => Boolean(node.id))
+    .map((node) => ({
+      ...node,
+      label: node.label ?? node.id,
+    }));
+
+const sanitizeEdges = (edges: GraphEdge[]): GraphEdge[] =>
+  edges.filter((edge) => Boolean(edge.source) && Boolean(edge.target));
+
 export const upsertGraph = async (
   userId: string,
   nodes: GraphNode[],
   edges: GraphEdge[],
 ): Promise<{nodeCount: number; edgeCount: number}> => {
+  const safeNodes = sanitizeNodes(nodes);
+  const safeEdges = sanitizeEdges(edges);
+
   const manifestRef = db.doc(`users/${userId}/${GRAPH_BASE_PATH}/${MANIFEST_COLLECTION}/${MANIFEST_ID}`);
   const nodesCol = db.collection(`users/${userId}/${GRAPH_BASE_PATH}/nodes`);
   const edgesCol = db.collection(`users/${userId}/${GRAPH_BASE_PATH}/edges`);
@@ -112,14 +127,14 @@ export const upsertGraph = async (
   const manifestSnap = await manifestRef.get();
   const manifest = ensureManifest(manifestSnap.data() as ManifestDocument | undefined);
 
-  mergeManifestNodes(manifest, nodes);
-  mergeManifestEdges(manifest, edges);
+  mergeManifestNodes(manifest, safeNodes);
+  mergeManifestEdges(manifest, safeEdges);
   recomputeManifestMetrics(manifest);
 
   const batch = db.batch();
   const now = new Date().toISOString();
 
-  nodes.forEach((node) => {
+  safeNodes.forEach((node) => {
     batch.set(
       nodesCol.doc(node.id),
       {
@@ -127,13 +142,13 @@ export const upsertGraph = async (
         label: node.label,
         type: node.type,
         updatedAt: now,
-        createdAt: admin.firestore.Timestamp.now(),
+        createdAt: Timestamp.now(),
       },
       {merge: true},
     );
   });
 
-  edges.forEach((edge) => {
+  safeEdges.forEach((edge) => {
     const edgeId = `${edge.source}__${edge.target}`;
     batch.set(
       edgesCol.doc(edgeId),
@@ -144,7 +159,7 @@ export const upsertGraph = async (
         weight: normalizeWeight(edge.weight),
         label: edge.label,
         updatedAt: now,
-        createdAt: admin.firestore.Timestamp.now(),
+        createdAt: Timestamp.now(),
       },
       {merge: true},
     );

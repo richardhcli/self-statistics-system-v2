@@ -11,17 +11,17 @@ HEADERS = {"x-user-id": "richard_li", "Content-Type": "application/json"}
 
 
 def submit_entry() -> Dict[str, Any]:
-    payload = {"content": "Architecture test.", "duration": 60}
-    response = requests.post(ENDPOINT, json=payload, headers=HEADERS, timeout=10)
+    payload = {"content": "This is a journal entry test.", "duration": 60}
+    response = requests.post(ENDPOINT, json=payload, headers=HEADERS, timeout=60)
     if response.status_code != 202:
         raise RuntimeError(f"Submit failed: {response.status_code} {response.text}")
     return response.json()
 
 
 def poll_job(job_id: str) -> Dict[str, Any]:
-    for _ in range(10):
+    for _ in range(60):
         time.sleep(1)
-        response = requests.get(ENDPOINT, params={"jobId": job_id}, headers=HEADERS, timeout=10)
+        response = requests.get(ENDPOINT, params={"jobId": job_id}, headers=HEADERS, timeout=60)
         data = response.json()
         status = data.get("status")
         if status == "completed":

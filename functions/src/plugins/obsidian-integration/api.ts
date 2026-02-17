@@ -1,5 +1,6 @@
 import {onRequest} from "firebase-functions/v2/https";
 import {PluginSDK} from "../../plugin-sdk";
+import {runJournalPipeline} from "../journal-pipeline/pipeline";
 import {ObsidianPayload} from "./types";
 
 /**
@@ -18,16 +19,15 @@ export const obsidianApi = onRequest(async (req, res) => {
         return;
       }
 
-      const durationValue = typeof duration === "number" ? duration : 0;
+      const result = await runJournalPipeline(userId, {
+        content,
+        duration: typeof duration === "number" ? duration : undefined,
+      });
 
-      const entryId = await sdk.journal.create(content, {duration: durationValue});
-      const jobId = await sdk.jobs.create("ai_analysis_obsidian", {entryId});
-
-      res.status(202).json({
+      res.status(200).json({
         success: true,
-        entryId,
-        jobId,
-        message: "Entry stored. AI analysis queued.",
+        message: "Entry stored and analyzed via pipeline.",
+        ...result,
       });
       return;
     }

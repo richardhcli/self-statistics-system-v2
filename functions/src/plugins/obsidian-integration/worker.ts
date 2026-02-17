@@ -2,6 +2,8 @@ import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import {PluginSDK} from "../../plugin-sdk";
 import {ObsidianAnalysisResult} from "./types";
 
+
+
 interface ObsidianJobRecord {
   type: string;
   status: string;
@@ -42,6 +44,7 @@ export const obsidianWorker = onDocumentCreated("users/{uid}/jobs/{jobId}", asyn
     if (!entry) {
       throw new Error("Journal entry not found");
     }
+
 
     const aiResult = await simulateAiAnalysis(String((entry as {content?: string} | undefined)?.content ?? ""));
 
