@@ -1,4 +1,4 @@
-import type {AiJournalAnalysis} from "../../services/ai-client";
+import type {TopologyResponse} from "../../services/genai-topology";
 import type {GraphEdge, GraphNode} from "../../services/graph-writer";
 
 export interface JournalPipelineRequest {
@@ -8,7 +8,7 @@ export interface JournalPipelineRequest {
 
 export interface JournalPipelineResponse {
   entryId: string;
-  analysis: AiJournalAnalysis;
+  analysis: TopologyResponse;
   graph: {
     nodeCount: number;
     edgeCount: number;
@@ -27,7 +27,7 @@ export interface JournalRecord {
   id: string;
   content: string;
   metadata?: Record<string, unknown>;
-  ai_analysis?: AiJournalAnalysis;
+  ai_analysis?: TopologyResponse;
   createdAt?: unknown;
   createdAtIso?: string;
 }

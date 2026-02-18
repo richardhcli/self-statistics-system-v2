@@ -1,26 +1,66 @@
 import {PluginSDK} from "../../plugin-sdk";
 import {analyzeJournal} from "../../services/ai-client";
 import {upsertGraph, type GraphEdge, type GraphNode} from "../../services/graph-writer";
+import type {TopologyResponse} from "../../services/genai-topology";
 import type {JournalPipelineRequest, JournalPipelineResponse} from "./types";
 
-const buildGraphPayload = (analysis: Awaited<ReturnType<typeof analyzeJournal>>): {
+const slugify = (value: string): string =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48) || "entry";
+
+export const buildGraphPayload = (topology: TopologyResponse): {
   nodes: GraphNode[];
   edges: GraphEdge[];
 } => {
-  const nodes: GraphNode[] = [
-    ...analysis.characteristics.map((c) => ({id: c.id, label: c.label, type: "characteristic" as const})),
-    ...analysis.skills.map((s) => ({id: s.id, label: s.label, type: "skill" as const})),
-    ...analysis.actions.map((a) => ({id: a.id, label: a.label, type: "action" as const})),
-  ];
+  const nodes = new Map<string, GraphNode>();
+  const edges: GraphEdge[] = [];
 
-  const edges: GraphEdge[] = analysis.links.map((link) => ({
-    source: link.source,
-    target: link.target,
-    weight: link.weight,
-    label: link.label,
-  }));
+  const addNode = (id: string, label: string, type: GraphNode["type"]) => {
+    if (!id || nodes.has(id)) return;
+    nodes.set(id, {id, label: label || id, type});
+  };
 
-  return {nodes, edges};
+  topology.weightedActions.forEach(({label}) => {
+    const id = `action-${slugify(label ?? "action")}`;
+    addNode(id, label ?? id, "action");
+  });
+
+  topology.skillMappings.forEach(({child, parent, weight}) => {
+    const parentId = `skill-${slugify(parent ?? "skill")}`;
+    const childId = `action-${slugify(child ?? "action")}`;
+    addNode(parentId, parent ?? parentId, "skill");
+    addNode(childId, child ?? childId, "action");
+    edges.push({source: parentId, target: childId, weight});
+  });
+
+  topology.characteristicMappings.forEach(({child, parent, weight}) => {
+    const parentId = `characteristic-${slugify(parent ?? "characteristic")}`;
+    const childId = `skill-${slugify(child ?? "skill")}`;
+    addNode(parentId, parent ?? parentId, "characteristic");
+    addNode(childId, child ?? childId, "skill");
+    edges.push({source: parentId, target: childId, weight});
+  });
+
+  const progressionId = "progression";
+
+  (topology.generalizationChain ?? []).forEach(({child, parent, weight}) => {
+    const parentId = `characteristic-${slugify(parent ?? "characteristic")}`;
+    const childId = `characteristic-${slugify(child ?? "characteristic")}`;
+    addNode(parentId, parent ?? parentId, "characteristic");
+    addNode(childId, child ?? childId, "characteristic");
+    edges.push({source: parentId, target: childId, weight});
+  });
+
+  Array.from(nodes.values())
+    .filter((node) => node.type === "characteristic" && node.id !== progressionId)
+    .forEach((node) => {
+      edges.push({source: progressionId, target: node.id, weight: 1});
+    });
+
+  return {nodes: Array.from(nodes.values()), edges};
 };
 
 export const runJournalPipeline = async (
@@ -30,26 +70,24 @@ export const runJournalPipeline = async (
   const {content, duration = 0} = payload;
   const sdk = new PluginSDK(userId);
 
-  const analysis = await analyzeJournal({content, duration});
+  const topology = await analyzeJournal({content, duration});
   const entryId = await sdk.journal.create(content, {duration});
 
   await sdk.journal.update(entryId, {
-    ai_analysis: analysis,
-    summary: analysis.summary,
-    tags: analysis.tags,
-    sentiment: analysis.sentiment,
+    ai_analysis: topology,
     updatedAt: new Date().toISOString(),
   });
 
-  const graphPayload = buildGraphPayload(analysis);
+  const graphPayload = buildGraphPayload(topology);
   const graphResult = await upsertGraph(userId, graphPayload.nodes, graphPayload.edges);
 
-  await sdk.user.updateStats(analysis.expReward);
+  const expReward = Math.max(50, Math.min(200, Math.round((duration || topology.durationMinutes || 30) / 30) * 50));
+  await sdk.user.updateStats(expReward);
 
   return {
     entryId,
-    analysis,
+    analysis: topology,
     graph: graphResult,
-    stats: {expReward: analysis.expReward},
+    stats: {expReward},
   };
 };

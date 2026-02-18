@@ -1,5 +1,6 @@
 import * as admin from "firebase-admin";
 import {Timestamp} from "firebase-admin/firestore";
+import * as logger from "firebase-functions/logger";
 
 export type GraphNodeType = "action" | "skill" | "characteristic";
 
@@ -112,6 +113,34 @@ const sanitizeNodes = (nodes: GraphNode[]): GraphNode[] =>
 const sanitizeEdges = (edges: GraphEdge[]): GraphEdge[] =>
   edges.filter((edge) => Boolean(edge.source) && Boolean(edge.target));
 
+const toNodePayload = (node: GraphNode) => {
+  const payload: Record<string, unknown> = {
+    id: node.id,
+    label: node.label,
+    type: node.type,
+    updatedAt: new Date().toISOString(),
+    createdAt: Timestamp.now(),
+  };
+  return payload;
+};
+
+const toEdgePayload = (edgeId: string, edge: GraphEdge) => {
+  const payload: Record<string, unknown> = {
+    id: edgeId,
+    source: edge.source,
+    target: edge.target,
+    weight: normalizeWeight(edge.weight),
+    updatedAt: new Date().toISOString(),
+    createdAt: Timestamp.now(),
+  };
+
+  if (edge.label !== undefined) {
+    payload.label = edge.label;
+  }
+
+  return payload;
+};
+
 export const upsertGraph = async (
   userId: string,
   nodes: GraphNode[],
@@ -119,6 +148,16 @@ export const upsertGraph = async (
 ): Promise<{nodeCount: number; edgeCount: number}> => {
   const safeNodes = sanitizeNodes(nodes);
   const safeEdges = sanitizeEdges(edges);
+
+  if (safeNodes.length !== nodes.length || safeEdges.length !== edges.length) {
+    logger.warn("graph-writer: filtered invalid entries", {
+      userId,
+      inputNodes: nodes.length,
+      safeNodes: safeNodes.length,
+      inputEdges: edges.length,
+      safeEdges: safeEdges.length,
+    });
+  }
 
   const manifestRef = db.doc(`users/${userId}/${GRAPH_BASE_PATH}/${MANIFEST_COLLECTION}/${MANIFEST_ID}`);
   const nodesCol = db.collection(`users/${userId}/${GRAPH_BASE_PATH}/nodes`);
@@ -132,37 +171,14 @@ export const upsertGraph = async (
   recomputeManifestMetrics(manifest);
 
   const batch = db.batch();
-  const now = new Date().toISOString();
 
   safeNodes.forEach((node) => {
-    batch.set(
-      nodesCol.doc(node.id),
-      {
-        id: node.id,
-        label: node.label,
-        type: node.type,
-        updatedAt: now,
-        createdAt: Timestamp.now(),
-      },
-      {merge: true},
-    );
+    batch.set(nodesCol.doc(node.id), toNodePayload(node), {merge: true});
   });
 
   safeEdges.forEach((edge) => {
     const edgeId = `${edge.source}__${edge.target}`;
-    batch.set(
-      edgesCol.doc(edgeId),
-      {
-        id: edgeId,
-        source: edge.source,
-        target: edge.target,
-        weight: normalizeWeight(edge.weight),
-        label: edge.label,
-        updatedAt: now,
-        createdAt: Timestamp.now(),
-      },
-      {merge: true},
-    );
+    batch.set(edgesCol.doc(edgeId), toEdgePayload(edgeId, edge), {merge: true});
   });
 
   await batch.commit();

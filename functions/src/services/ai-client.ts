@@ -1,20 +1,4 @@
-export interface AiLink {
-  source: string;
-  target: string;
-  weight?: number;
-  label?: string;
-}
-
-export interface AiJournalAnalysis {
-  summary: string;
-  tags: string[];
-  sentiment: string;
-  expReward: number;
-  actions: {id: string; label: string}[];
-  skills: {id: string; label: string}[];
-  characteristics: {id: string; label: string}[];
-  links: AiLink[];
-}
+import type {TopologyResponse} from "./genai-topology";
 
 const buildGatewayUrl = (): string => {
   const projectId = process.env.GCLOUD_PROJECT || "self-statistics-system-v2";
@@ -29,7 +13,7 @@ const buildGatewayUrl = (): string => {
 
 export const analyzeJournal = async (
   payload: {content: string; duration?: number},
-): Promise<AiJournalAnalysis> => {
+): Promise<TopologyResponse> => {
   const fetchFn: (input: string, init?: Record<string, unknown>) => Promise<any> =
     (globalThis as unknown as {fetch?: (input: string, init?: Record<string, unknown>) => Promise<any>}).fetch ??
     (() => {
@@ -47,6 +31,6 @@ export const analyzeJournal = async (
     throw new Error(`AI gateway error ${response.status}: ${text}`);
   }
 
-  const data = (await response.json()) as AiJournalAnalysis;
+  const data = (await response.json()) as TopologyResponse;
   return data;
 };

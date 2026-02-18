@@ -1,24 +1,18 @@
 import {onDocumentCreated} from "firebase-functions/v2/firestore";
+import * as logger from "firebase-functions/logger";
 import {PluginSDK} from "../../plugin-sdk";
-import {ObsidianAnalysisResult} from "./types";
-
-
+import {analyzeJournal} from "../../services/ai-client";
+import {upsertGraph} from "../../services/graph-writer";
+import {buildGraphPayload} from "../journal-pipeline/pipeline";
 
 interface ObsidianJobRecord {
   type: string;
   status: string;
   payload?: {
     entryId?: string;
+    duration?: number;
   };
 }
-
-const simulateAiAnalysis = async (text: string): Promise<ObsidianAnalysisResult> => {
-  return {
-    summary: `Analyzed: ${text.substring(0, 30)}...`,
-    tags: ["productivity", "obsidian"],
-    expReward: 100,
-  };
-};
 
 /**
  * Firestore trigger to process queued Obsidian jobs.
@@ -36,6 +30,7 @@ export const obsidianWorker = onDocumentCreated("users/{uid}/jobs/{jobId}", asyn
     await sdk.jobs.updateStatus(jobId, "processing");
 
     const entryId = jobData.payload?.entryId;
+    const durationPayload = jobData.payload?.duration;
     if (!entryId) {
       throw new Error("Missing entryId in job payload");
     }
@@ -45,19 +40,38 @@ export const obsidianWorker = onDocumentCreated("users/{uid}/jobs/{jobId}", asyn
       throw new Error("Journal entry not found");
     }
 
+    const content = (entry as {content?: string} | undefined)?.content ?? "";
+    const duration = typeof durationPayload === "number"
+      ? durationPayload
+      : (entry as {metadata?: {duration?: number}} | undefined)?.metadata?.duration ?? 0;
 
-    const aiResult = await simulateAiAnalysis(String((entry as {content?: string} | undefined)?.content ?? ""));
+    if (!content) {
+      throw new Error("Journal entry missing content");
+    }
 
-    await sdk.journal.update(entryId, {
-      ai_analysis: aiResult,
-      tags: aiResult.tags,
+    logger.info("obsidianWorker processing", {userId: uid, jobId, entryId, duration});
+
+    const topology = await analyzeJournal({content, duration});
+
+    const graphPayload = buildGraphPayload(topology);
+    const graphResult = await upsertGraph(uid, graphPayload.nodes, graphPayload.edges);
+
+    logger.info("obsidianWorker graph upserted", {
+      userId: uid,
+      jobId,
+      entryId,
+      nodes: graphPayload.nodes.length,
+      edges: graphPayload.edges.length,
     });
 
-    await sdk.user.updateStats(aiResult.expReward);
-
-    await sdk.jobs.updateStatus(jobId, "completed", aiResult as unknown as Record<string, unknown>);
+    await sdk.jobs.updateStatus(jobId, "completed", {
+      entryId,
+      graph: graphResult,
+      result: {nodesMade: graphPayload.nodes.length},
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
+    logger.error("obsidianWorker failed", {userId: uid, jobId, error: message});
     await sdk.jobs.updateStatus(jobId, "failed", {error: message});
   }
 });

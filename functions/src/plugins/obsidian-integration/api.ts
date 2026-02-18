@@ -1,6 +1,6 @@
 import {onRequest} from "firebase-functions/v2/https";
 import {PluginSDK} from "../../plugin-sdk";
-import {runJournalPipeline} from "../journal-pipeline/pipeline";
+import * as logger from "firebase-functions/logger";
 import {ObsidianPayload} from "./types";
 
 /**
@@ -19,15 +19,18 @@ export const obsidianApi = onRequest(async (req, res) => {
         return;
       }
 
-      const result = await runJournalPipeline(userId, {
-        content,
-        duration: typeof duration === "number" ? duration : undefined,
-      });
+      const durationValue = typeof duration === "number" ? duration : 0;
 
-      res.status(200).json({
+      const entryId = await sdk.journal.create(content, {duration: durationValue});
+      const jobId = await sdk.jobs.create("ai_analysis_obsidian", {entryId, duration: durationValue});
+
+      logger.info("obsidianApi queued job", {userId, entryId, jobId});
+
+      res.status(202).json({
         success: true,
-        message: "Entry stored and analyzed via pipeline.",
-        ...result,
+        entryId,
+        jobId,
+        message: "Entry stored. AI analysis queued.",
       });
       return;
     }
@@ -37,6 +40,7 @@ export const obsidianApi = onRequest(async (req, res) => {
       const job = await sdk.jobs.get(jobId);
 
       if (!job) {
+        logger.warn("obsidianApi job not found", {userId, jobId});
         res.status(404).json({error: "Job not found"});
         return;
       }
@@ -48,8 +52,7 @@ export const obsidianApi = onRequest(async (req, res) => {
     res.status(405).json({error: "Method Not Allowed"});
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    // Emit error details to logs for debugging.
-    console.error("obsidianApi error", message, error);
+    logger.error("obsidianApi error", {message, error});
     res.status(500).json({error: message});
   }
 });
