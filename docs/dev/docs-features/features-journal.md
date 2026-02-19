@@ -23,6 +23,6 @@
 - Desktop layout keeps inputs sticky on the left; journal scrolls on the right.
 
 ## Deep Dive (Human Docs)
-- [documentation/docs-features/journal/features-journal.md](journal/features-journal.md)
-- [documentation/change-log/2026-02-07-JOURNAL_ARCHITECTURE_PLAN.md](../change-log/2026-02-07-JOURNAL_ARCHITECTURE_PLAN.md)
-- [documentation/change-log/2026-02-07-STORAGE_ARCHITECTURE_BLUEPRINT.md](../change-log/2026-02-07-STORAGE_ARCHITECTURE_BLUEPRINT.md)
+- [docs/docs-features/journal/features-journal.md](journal/features-journal.md)
+- [docs/change-log/2026-02-07-JOURNAL_ARCHITECTURE_PLAN.md](../change-log/2026-02-07-JOURNAL_ARCHITECTURE_PLAN.md)
+- [docs/change-log/2026-02-07-STORAGE_ARCHITECTURE_BLUEPRINT.md](../change-log/2026-02-07-STORAGE_ARCHITECTURE_BLUEPRINT.md)

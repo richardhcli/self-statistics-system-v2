@@ -5,7 +5,7 @@
  * All entries are normalized by ID and indexed by a lightweight tree.
  *
  * @module stores/journal/types
- * @see {@link /documentation/state-management/GLOBAL_STATE.md} for state patterns
+ * @see {@link /docs/state-management/GLOBAL_STATE.md} for state patterns
  */
 
 // ============================================================

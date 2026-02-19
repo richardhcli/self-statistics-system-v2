@@ -10,7 +10,7 @@ Establishing the foundation for multi-device synchronization and persistent clou
 - **Emulator Parity**: Replaced legacy `FieldValue.serverTimestamp()` usage with `Timestamp.now()` to fix Firestore writes on the emulator. See [functions/src/plugin-sdk/index.ts](functions/src/plugin-sdk/index.ts).
 - **Resilient HTTPS Ingest**: Wrapped Obsidian ingest endpoint in structured `try/catch`, surfacing JSON errors instead of silent 500s. See [functions/src/plugins/obsidian-integration/api.ts](functions/src/plugins/obsidian-integration/api.ts).
 - **Green E2E Harness**: Emulator polling script now passes end-to-end for submit → queue → AI tagging → XP update. See [testing/testing-backend/testing-emulator/test-obsidian.py](testing/testing-backend/testing-emulator/test-obsidian.py).
-- **Documentation**: Added Functions runbook and plugin style guide for future integrations. See [documentation/backend/functions/firebase-functions.md](documentation/backend/functions/firebase-functions.md) and [documentation/backend/functions/plugins-style-guide.md](documentation/backend/functions/plugins-style-guide.md).
+- **Documentation**: Added Functions runbook and plugin style guide for future integrations. See [docs/backend/functions/firebase-functions.md](docs/backend/functions/firebase-functions.md) and [docs/backend/functions/plugins-style-guide.md](docs/backend/functions/plugins-style-guide.md).
 
 ### [v2.0.3] - Synchronous journal pipeline
 - **journalPipeline**: New HTTPS endpoint that ingests a journal entry, calls the AI gateway, updates graph topology and XP, and returns the result in one call. See [functions/src/plugins/journal-pipeline/api.ts](functions/src/plugins/journal-pipeline/api.ts).

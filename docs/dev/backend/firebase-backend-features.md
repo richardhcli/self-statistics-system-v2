@@ -30,7 +30,7 @@ Defined in [src/lib/firebase/user-profile.ts](../../src/lib/firebase/user-profil
 
 ## Debug Datastores View
 The debug datastores view can fetch backend snapshots, hydrate stores, and remove documents or fields.
-- Feature doc: [documentation/docs-features/features-datastores-debug.md](../docs-features/features-datastores-debug.md)
+- Feature doc: [docs/docs-features/features-datastores-debug.md](../docs-features/features-datastores-debug.md)
 - Force sync UI: [src/features/debug/components/force-sync-panel.tsx](../../src/features/debug/components/force-sync-panel.tsx)
 - Snapshot mapping: [src/features/debug/utils/datastore-sync.ts](../../src/features/debug/utils/datastore-sync.ts)
 

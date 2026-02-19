@@ -11,7 +11,7 @@
  * - Centralized logout helper for consistent sign-out
  * - React Context for app-wide auth state access
  * 
- * @see documentation/change-log-journal/v2_changelog/2026-02-13-auto-sign-in.md
+ * @see docs/change-log-journal/v2_changelog/2026-02-13-auto-sign-in.md
  */
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';

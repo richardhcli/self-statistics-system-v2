@@ -7,7 +7,7 @@
 **Related Documents**:
 	- [plugins-style-guide.md](./plugins-style-guide.md) — rules for building new plugins
 	- [functions/src/index.ts](functions/src/index.ts) — exported functions registry
-	- [documentation/changelog.md](documentation/changelog.md) — release notes
+	- [docs/changelog.md](docs/changelog.md) — release notes
 
 ---
 

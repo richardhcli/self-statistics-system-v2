@@ -1,4 +1,5 @@
 import {GoogleGenAI} from "@google/genai";
+import * as logger from "firebase-functions/logger";
 
 export interface WeightedAction {
   label: string;
@@ -146,11 +147,28 @@ export const generateTopology = async (text: string): Promise<TopologyResponse> 
             },
           },
         }),
-        45000,
+        120000,
         `genai-topology ${model}`,
       )) as {response?: {text(): string}};
 
-      const parsed = JSON.parse(result.response?.text() ?? "{}") as Partial<TopologyResponse>;
+      const raw = result.response?.text();
+      logger.info(`genai-topology success with model ${model}`, {raw});
+
+      const parsed = JSON.parse(raw ?? "{}") as Partial<TopologyResponse>;
+      if (Object.keys(parsed).length === 0) {
+        logger.warn("genai-topology empty payload", {model, raw});
+        throw new Error("Empty response from GenAI");
+      }
+
+      logger.info("genai-topology parsed payload", {
+        model,
+        duration: parsed.durationMinutes,
+        actions: parsed.weightedActions?.length ?? 0,
+        skills: parsed.skillMappings?.length ?? 0,
+        characteristics: parsed.characteristicMappings?.length ?? 0,
+        generalizations: parsed.generalizationChain?.length ?? 0,
+      });
+
       return {
         durationMinutes: parsed.durationMinutes ?? 30,
         weightedActions: parsed.weightedActions ?? [],

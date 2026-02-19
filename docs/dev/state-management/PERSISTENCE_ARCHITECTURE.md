@@ -505,4 +505,4 @@ it('should hydrate from IndexedDB', async () => {
 
 - [stores/README.md](../stores/README.md) - Store architecture and Separated Selector Facade Pattern
 - [ROADMAP.md](./ROADMAP.md) - Future schema migrations and sync protocol
-- [documentation/JOURNAL_REFACTOR_MIGRATION.md](./JOURNAL_REFACTOR_MIGRATION.md) - Component migration guide
+- [docs/JOURNAL_REFACTOR_MIGRATION.md](./JOURNAL_REFACTOR_MIGRATION.md) - Component migration guide

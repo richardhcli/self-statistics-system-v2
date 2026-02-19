@@ -41,7 +41,7 @@ The system uses a deterministic "Neural Brain" to convert text → valid semanti
 *   **Model Strategy:** Always use **Primary (Gemini 3)** → **Fallback (Gemini 2)** logic.
 *   **Safety:** Always serialize user input with `JSON.stringify()` before prompt injection.
 *   **Temperature:** Locked to `0.0` for consistency.
-*   **Pipeline Logic:** [documentation/LLM-usage/ai-pipeline-strategy.md](documentation/LLM-usage/ai-pipeline-strategy.md)
+*   **Pipeline Logic:** [docs/LLM-usage/ai-pipeline-strategy.md](docs/LLM-usage/ai-pipeline-strategy.md)
 
 ## 5. Coding Standards
 1.  **File Naming:** Strict kebab-case (e.g., `voice-recorder.tsx`).
@@ -50,9 +50,9 @@ The system uses a deterministic "Neural Brain" to convert text → valid semanti
 4.  **No Code Snippets in Docs:** Link to source files instead.
 
 ## 6. Documentation Maintenance
-*   **Change Log:** Update `documentation/change-log/` after every meaningful session.
+*   **Change Log:** Update `docs/change-log/` after every meaningful session.
 *   **Guidelines:** Review this file before proposing architectural changes.
-*   **Features:** Keep `documentation/docs-features/` relevant to the current code state.
+*   **Features:** Keep `docs/docs-features/` relevant to the current code state.
 
 # AI COMMANDS:
 
@@ -60,4 +60,4 @@ The system uses a deterministic "Neural Brain" to convert text → valid semanti
 - Edit directly: Immediate edit files without terminal commands. 
 - Always completely migrate: Completely physically delete and destroy all legacy files; backward compatibility is unnecessary and unneeded. Remove converter files.  Update all utilities, functions, and documentation to adhere to the new standard.  
 - Prepare commit: after changing, create a summary of all changes, and write a git add and git commit message to summarize changes made. Return this copy-pastable message to the user for user convenience. 
-- Documentation standards: always adhere to JSDoc or similar comment standards. After major changes, create a small short concise paragraph summary of the change appended to documentation/change-log/<today's date README>. There is no need for a new documentation note. If the change can be summarized in the git commit message, there is no need for a dedicated log. 
+- Documentation standards: always adhere to JSDoc or similar comment standards. After major changes, create a small short concise paragraph summary of the change appended to docs/change-log/<today's date README>. There is no need for a new documentation note. If the change can be summarized in the git commit message, there is no need for a dedicated log. 

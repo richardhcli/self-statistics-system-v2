@@ -15,8 +15,8 @@
  * not the system's generation method. 
  * 
  * @module features/journal/types
- * @see {@link /documentation/state-management/GLOBAL_STATE.md} for state patterns when reading from global store
- * @see {@link /documentation/state-management/LOCAL_STATE.md} for component-level state patterns
+ * @see {@link /docs/state-management/GLOBAL_STATE.md} for state patterns when reading from global store
+ * @see {@link /docs/state-management/LOCAL_STATE.md} for component-level state patterns
  */
 import {
   JournalEntryData,

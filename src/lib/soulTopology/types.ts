@@ -6,8 +6,8 @@
  * and their transformation into hierarchical concept graphs.
  * 
  * @module lib/soulTopology/types
- * @see {@link /documentation/data-model.md} for topology architecture
- * @see {@link /documentation/cdag-topology.md} for CDAG structure details
+ * @see {@link /docs/data-model.md} for topology architecture
+ * @see {@link /docs/cdag-topology.md} for CDAG structure details
  */
 
 /**
