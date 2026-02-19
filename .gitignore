@@ -34,3 +34,6 @@ dist-ssr
 #firebase files
 .firebase
 .firebase/*
+
+#personal
+.ai/blueprints

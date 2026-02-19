@@ -121,4 +121,3 @@ These provide context and guidance; updated as the project evolves:
 
 1. **After major refactors**: Update [ai-guidelines.md](../ai-guidelines.md) and relevant pattern docs. Create a new refactor-specific changelog. 
 2. **After new features**: Update the relevant doc in [docs-features/](./docs-features/)
-4. **Version releases** / **Significant changes**: Update [changelog.md](./changelog.md)
