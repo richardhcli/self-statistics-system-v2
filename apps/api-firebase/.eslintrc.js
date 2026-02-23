@@ -30,5 +30,14 @@ module.exports = {
     "import/no-unresolved": 0,
     "indent": ["off"], // "error", 2
     "max-len": ["off"],
+    "linebreak-style": "off",
+  },
+  settings: {
+    "import/resolver": {
+      typescript: {
+        alwaysTryTypes: true,
+        project: "./tsconfig.json",
+      },
+    },
   },
 };

@@ -1,4 +1,8 @@
 {
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true //Your apps/api-firebase/tsconfig.dev.json is configured to include [".eslintrc.js"] so that your linter can lint its own configuration file. The problem is that .eslintrc.js is a JavaScript file, and by default, the TypeScript compiler completely ignores JavaScript files. Because it ignores the only file you told it to look at, it throws a "no inputs found" error.
+  },
   "include": [
     ".eslintrc.js"
   ]
