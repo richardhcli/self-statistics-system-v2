@@ -24,7 +24,7 @@ Successfully removed ALL legacy code from the monolithic AppData architecture. T
 - ❌ **getCurrentData()** - Removed with stores/app-data deletion
 
 ### 4. Type System Updates
-- ❌ **AppData type** - No longer exported from @/types (replaced by RootState for serialization only)
+- ❌ **AppData type** - No longer exported from @web/types (replaced by RootState for serialization only)
 - ✅ **RootState type** - New type for root composition (serialization/deserialization only)
 
 ## What Was Migrated
@@ -93,7 +93,7 @@ const { applyEntryUpdates } = useEntryOrchestrator();
 ### Persistence Pattern
 ```typescript
 // Root composition ONLY for serialization
-import { serializeRootState, deserializeRootState } from '@/stores/root';
+import { serializeRootState, deserializeRootState } from '@web/stores/root';
 
 // At persistence layer:
 const rootState = serializeRootState(); // Aggregates all stores

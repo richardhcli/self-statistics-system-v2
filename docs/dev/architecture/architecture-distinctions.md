@@ -16,7 +16,7 @@ The `/lib` folder contains the domain's "Soul"—the pure math, algorithms, and 
 * **Agnosticism**: Library code should not know it is being used in a React app or persisted to IndexedDB.
 
 ### Implementation Rules
-* ❌ **NO** imports from `@/stores`.
+* ❌ **NO** imports from `@web/stores`.
 * ❌ **NO** Zustand `create` calls or React hooks.
 * ✅ **DO** define complex types and algorithms here.
 
@@ -33,7 +33,7 @@ The `/stores` folder manages how data is held in memory, persisted to disk, and 
 * **Glue Logic**: Actions in this layer call `/lib` utilities to perform computations.
 
 ### Implementation Rules
-* ✅ **DO** import types and utilities from `@/lib`.
+* ✅ **DO** import types and utilities from `@web/lib`.
 * ✅ **DO** group setters into a stable `actions` object.
 * ✅ **DO** use `partialize` to whitelist only serializable data keys.
 
@@ -71,7 +71,7 @@ The `/systems` folder contains **pure, side-effect-free domain logic** that is t
 * **State Mutation Functions**: Pure functions that take state + input → return new state. They never call stores directly.
 
 ### Implementation Rules
-* ❌ **NO** imports from `@/stores` or React hooks.
+* ❌ **NO** imports from `@web/stores` or React hooks.
 * ❌ **NO** side effects — all functions are pure.
 * ✅ **DO** export via barrel `index.ts`.
 * ✅ **DO** import in stores, hooks, and components as `@systems/[module]`.

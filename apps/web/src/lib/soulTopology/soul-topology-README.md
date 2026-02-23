@@ -11,7 +11,7 @@ It owns the utilities that build, merge, and propagate the CDAG topology and pro
 
 
 ### Key exception: storage management
-- This library does not manage the STORAGE of the cdag-topology graph, that should be implemented by the user in @/stores. 
+- This library does not manage the STORAGE of the cdag-topology graph, that should be implemented by the user in @web/stores. 
 - /lib is for Implementation: This folder should contain the "engine"—the pure utility functions, complex graph algorithms, and TypeScript definitions for your topology. These should be data-agnostic and testable in isolation. 
 - /stores is for State: This folder handles the Zustand implementation, IndexedDB persistence logic via idb-keyval, and the Separated Selector Facade Pattern hooks.
 - The Relationship: Your store in /stores/cdag-topology will import the pure logic and types from /lib/soulTopology to execute mutations.

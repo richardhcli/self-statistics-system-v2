@@ -36,7 +36,7 @@ return (
 ### After: Self-Contained Feature
 ```typescript
 // ✅ New pattern: Single self-contained component
-import { JournalFeature } from '@/features/journal';
+import { JournalFeature } from '@web/features/journal';
 
 return (
   <JournalFeature onIntegrationEvent={handleIntegration} />
@@ -94,14 +94,14 @@ import {
   VoiceRecorder, 
   ManualEntryForm,
   createJournalEntry 
-} from '@/features/journal';
+} from '@web/features/journal';
 ```
 
 **After**:
 ```typescript
-import { JournalFeature } from '@/features/journal';
+import { JournalFeature } from '@web/features/journal';
 // Or for granular access:
-import { useJournalStore } from '@/features/journal';
+import { useJournalStore } from '@web/features/journal';
 ```
 
 ### 2. Replace Multiple Components with Feature Component
@@ -183,7 +183,7 @@ State is scoped to the component that needs it, making the code simpler and easi
 ### Accessing Journal Data
 
 ```typescript
-import { useJournalStore } from '@/features/journal';
+import { useJournalStore } from '@web/features/journal';
 
 function MyComponent() {
   const { journal } = useJournalStore();
@@ -198,7 +198,7 @@ function MyComponent() {
 ### Creating Entries Programmatically
 
 ```typescript
-import { createJournalEntry } from '@/features/journal';
+import { createJournalEntry } from '@web/features/journal';
 
 await createJournalEntry({
   entry: 'I coded for 2 hours',
@@ -211,7 +211,7 @@ await createJournalEntry({
 ### Updating Entries Directly
 
 ```typescript
-import { upsertJournalEntry } from '@/features/journal';
+import { upsertJournalEntry } from '@web/features/journal';
 
 upsertJournalEntry(
   { year: '2026', month: 'January', day: '15', time: '10:30' },

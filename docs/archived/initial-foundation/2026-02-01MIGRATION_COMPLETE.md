@@ -168,9 +168,9 @@ deserializeRootState(persisted);         // Distribute to all stores
 ### ❌ OLD CODE (NO LONGER WORKS)
 ```typescript
 // Deleted
-import { useAppData } from '@/hooks/use-app-data';
-import { AppData } from '@/types';
-import { useAppDataStore } from '@/stores/app-data';
+import { useAppData } from '@web/hooks/use-app-data';
+import { AppData } from '@web/types';
+import { useAppDataStore } from '@web/stores/app-data';
 
 // These don't exist anymore
 const { data, setData } = useAppData();
@@ -180,9 +180,9 @@ await createJournalEntry({...});
 ### ✅ NEW WAY (USE THIS)
 ```typescript
 // Use individual store hooks
-import { useJournal, useJournalActions } from '@/stores/journal';
-import { usePlayerStatistics } from '@/stores/player-statistics';
-import { useCdagTopology } from '@/stores/cdag-topology';
+import { useJournal, useJournalActions } from '@web/stores/journal';
+import { usePlayerStatistics } from '@web/stores/player-statistics';
+import { useCdagTopology } from '@web/stores/cdag-topology';
 
 // In components
 const journal = useJournal();

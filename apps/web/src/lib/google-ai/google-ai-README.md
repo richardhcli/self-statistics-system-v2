@@ -27,7 +27,7 @@ Pure AI integration layer for semantic analysis and information extraction.
 
 ### Design Philosophy
 
-- **Pure Utilities**: No imports from `@/stores` or React hooks
+- **Pure Utilities**: No imports from `@web/stores` or React hooks
 - **Data-In, Data-Out**: All functions accept text, return structured data
 - **Timeout Protection**: All AI calls wrapped with timeout handlers
 - **Graceful Degradation**: Returns safe defaults on AI failures
@@ -214,8 +214,8 @@ expect(mockAnalysis.weightedActions).toBeDefined();
 ## Dependencies
 
 - `@google/genai` - Official Gemini SDK
-- `@/types` - Shared type definitions (GraphState, TextToActionResponse)
-- No dependencies on `@/stores` or React (pure utilities)
+- `@web/types` - Shared type definitions (GraphState, TextToActionResponse)
+- No dependencies on `@web/stores` or React (pure utilities)
 
 ## Future Enhancements
 

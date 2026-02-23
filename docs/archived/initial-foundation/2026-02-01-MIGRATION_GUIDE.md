@@ -10,7 +10,7 @@ This guide helps migrate from the legacy monolithic `AppData` pattern to the new
 
 **Before:**
 ```typescript
-import { useAppDataStore } from '@/stores/app-data';
+import { useAppDataStore } from '@web/stores/app-data';
 const data = useAppDataStore(state => state.data);
 const setData = useAppDataStore(state => state.setData);
 ```
@@ -18,12 +18,12 @@ const setData = useAppDataStore(state => state.setData);
 **After:**
 ```typescript
 // Import specific store hooks
-import { useJournal, useJournalActions } from '@/stores/journal';
-import { usePlayerStatistics, usePlayerStatisticsActions } from '@/stores/player-statistics';
-import { useCdagTopology, useCdagTopologyActions } from '@/stores/cdag-topology';
-import { useUserInformation, useUserInformationActions } from '@/stores/user-information';
-import { useAiConfig, useAiConfigActions } from '@/stores/ai-config';
-import { useUserIntegrations, useUserIntegrationsActions } from '@/stores/user-integrations';
+import { useJournal, useJournalActions } from '@web/stores/journal';
+import { usePlayerStatistics, usePlayerStatisticsActions } from '@web/stores/player-statistics';
+import { useCdagTopology, useCdagTopologyActions } from '@web/stores/cdag-topology';
+import { useUserInformation, useUserInformationActions } from '@web/stores/user-information';
+import { useAiConfig, useAiConfigActions } from '@web/stores/ai-config';
+import { useUserIntegrations, useUserIntegrationsActions } from '@web/stores/user-integrations';
 
 // Read state with selectors
 const journal = useJournal();
@@ -84,7 +84,7 @@ interface AppData {
 **After:**
 ```typescript
 // Local feature state
-import { useVisualGraph } from '@/features/visual-graph/store';
+import { useVisualGraph } from '@web/features/visual-graph/store';
 
 const MyComponent = () => {
   const { graph, updateNode, addEdge } = useVisualGraph();
@@ -96,14 +96,14 @@ const MyComponent = () => {
 
 **Before:**
 ```typescript
-import { getCurrentData } from '@/stores/app-data';
+import { getCurrentData } from '@web/stores/app-data';
 const data = getCurrentData();
 await db.put('appData', data);
 ```
 
 **After:**
 ```typescript
-import { serializeRootState, deserializeRootState } from '@/stores/root';
+import { serializeRootState, deserializeRootState } from '@web/stores/root';
 
 // Serialize all stores
 const rootState = serializeRootState();
@@ -114,7 +114,7 @@ const loaded = await db.get('rootState');
 deserializeRootState(loaded);
 
 // Or save individually
-import { getJournalEntries } from '@/stores/journal';
+import { getJournalEntries } from '@web/stores/journal';
 await db.put('journal', getJournalEntries());
 ```
 
@@ -313,7 +313,7 @@ downloadJSON(rootState);
 - [ ] Replace `useAppDataStore()` with specific store hooks
 - [ ] Convert utilities to pure functions
 - [ ] Create orchestrator hooks for cross-store logic
-- [ ] Update imports from `@/stores/app-data` to specific stores
+- [ ] Update imports from `@web/stores/app-data` to specific stores
 - [ ] Update persistence code to use `serializeRootState()`
 - [ ] Move visual-graph state to local component state
 - [ ] Test all features after migration

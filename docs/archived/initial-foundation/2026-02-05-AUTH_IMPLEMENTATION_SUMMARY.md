@@ -209,7 +209,7 @@ export const AppRoutes = ({ children }) {
 
 To use this auth system in new components:
 
-- [ ] Import `useAuth()` from `@/providers/auth-provider`
+- [ ] Import `useAuth()` from `@web/providers/auth-provider`
 - [ ] Call `const { user, loading } = useAuth()`
 - [ ] Check `loading` state before rendering user-dependent UI
 - [ ] Use `user.uid` for Firestore queries
@@ -217,7 +217,7 @@ To use this auth system in new components:
 
 Example:
 ```typescript
-import { useAuth } from '@/providers/auth-provider';
+import { useAuth } from '@web/providers/auth-provider';
 
 export const MyComponent = () => {
   const { user, loading } = useAuth();

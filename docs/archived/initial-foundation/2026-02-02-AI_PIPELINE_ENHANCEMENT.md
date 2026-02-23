@@ -128,7 +128,7 @@ Enhanced `entry-pipeline/index.ts` module documentation:
 ## Architecture Compliance
 
 ### Pure Utility Standards
-- ✅ No imports from `@/stores`
+- ✅ No imports from `@web/stores`
 - ✅ No React hooks
 - ✅ Data-In, Data-Out pattern maintained
 - ✅ Fully testable in isolation

@@ -64,9 +64,9 @@ The **Composition Root** (usually in `src/routes` or `src/app`) is where the fea
 
 ```tsx
 // src/app/admin-page.tsx
-import { DebugLayout } from '@/features/debug';
-import { DeveloperGraph } from '@/features/developer-graph';
-import { GraphControls } from '@/features/developer-graph';
+import { DebugLayout } from '@web/features/debug';
+import { DeveloperGraph } from '@web/features/developer-graph';
+import { GraphControls } from '@web/features/developer-graph';
 
 export const AdminPage = () => {
   return (

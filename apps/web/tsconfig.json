@@ -20,12 +20,13 @@
     "moduleDetection": "force",
     "allowJs": true,
     "jsx": "react-jsx",
+    //With "baseUrl": "./", TypeScript will look for files starting at the same folder as the tsconfig.json:
     "paths": {
-      "@/*": [
-        "apps/frontend/src/*"
+      "@web/*": [
+        "./apps/web/src/*"
       ],
       "@systems/*": [
-        "apps/frontend/src/systems/*"
+        "./apps/web/src/systems/*"
       ]
     },
     "allowImportingTsExtensions": true,

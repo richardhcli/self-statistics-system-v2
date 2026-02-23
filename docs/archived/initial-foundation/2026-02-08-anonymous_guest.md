@@ -34,7 +34,7 @@ This plan has been refined based on the existing project structure.
     *   **File:** [src/features/auth/utils/login-guest.ts](../../src/features/auth/utils/login-guest.ts)
     *   **Task:** Create `loginAsGuest` helper.
     *   **Implementation Details:**
-        *   Import `auth` from `@/lib/firebase` and call `signInAnonymously(auth)`.
+        *   Import `auth` from `@web/lib/firebase` and call `signInAnonymously(auth)`.
         *   Sync a placeholder profile via [src/lib/firebase/user-profile.ts](../../src/lib/firebase/user-profile.ts) to align with read-aside store fetches.
         *   Return the Firebase `user` object.
 

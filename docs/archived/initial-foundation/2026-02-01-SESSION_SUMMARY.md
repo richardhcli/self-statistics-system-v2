@@ -272,8 +272,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './assets/css/global.css';  // ✅ Vite processes this
 import './assets/css/layout.css';  // ✅ Vite processes this
-import App from '@/app/app';
-import { AppProvider } from '@/app/provider';
+import App from '@web/app/app';
+import { AppProvider } from '@web/app/provider';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -297,7 +297,7 @@ root.render(
 // ✅ Just exports the component
 
 import React, { useState } from 'react';
-import { usePersistence } from '@/hooks/use-persistence';
+import { usePersistence } from '@web/hooks/use-persistence';
 // ... other imports
 
 const App: React.FC = () => {

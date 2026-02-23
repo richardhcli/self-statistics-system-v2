@@ -371,9 +371,9 @@ Firebase sync is implemented via service-layer functions in `src/lib/firebase/`.
 
 ```typescript
 // Pattern: Service-layer sync (already implemented)
-import { syncJournalToFirebase } from '@/lib/firebase/journal';
-import { syncGraphToFirebase } from '@/lib/firebase/graph-service';
-import { syncPlayerStatsToFirebase } from '@/lib/firebase/player-statistics';
+import { syncJournalToFirebase } from '@web/lib/firebase/journal';
+import { syncGraphToFirebase } from '@web/lib/firebase/graph-service';
+import { syncPlayerStatsToFirebase } from '@web/lib/firebase/player-statistics';
 ```
 
 ### Read-Aside Flow
@@ -396,7 +396,7 @@ import { syncPlayerStatsToFirebase } from '@/lib/firebase/player-statistics';
 ### `usePersistence()` Hook
 
 ```typescript
-import { usePersistence } from '@/hooks/use-persistence';
+import { usePersistence } from '@web/hooks/use-persistence';
 
 const { isInitialized } = usePersistence();
 
@@ -410,7 +410,7 @@ if (!isInitialized) return <LoadingScreen />;
 ### `clearAllPersistedData()` Function
 
 ```typescript
-import { clearAllPersistedData } from '@/stores/root/persist-middleware';
+import { clearAllPersistedData } from '@web/stores/root/persist-middleware';
 
 // Clears entire IndexedDB (all stores)
 await clearAllPersistedData();
@@ -421,7 +421,7 @@ await clearAllPersistedData();
 ### `listPersistedKeys()` Function
 
 ```typescript
-import { listPersistedKeys } from '@/stores/root/persist-middleware';
+import { listPersistedKeys } from '@web/stores/root/persist-middleware';
 
 // Lists all persisted keys (for debugging)
 const keys = await listPersistedKeys();

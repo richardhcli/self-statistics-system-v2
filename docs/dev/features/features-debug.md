@@ -45,7 +45,7 @@ const data = useStore.getState().data;  // ✅
 Displays serialized JSON of all application stores.
 
 **Implementation:**
-- Uses `serializeRootState()` from `@/stores/root`
+- Uses `serializeRootState()` from `@web/stores/root`
 - Accesses state directly: `useStore.getState().dataProperty`
 - Never uses non-existent getter methods
 

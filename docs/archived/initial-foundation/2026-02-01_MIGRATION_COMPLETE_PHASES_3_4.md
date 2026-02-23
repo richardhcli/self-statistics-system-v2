@@ -99,16 +99,16 @@ export const useCreateJournalEntry = () => {
 **Changes**:
 - `types/index.ts` - Updated exports to include `RootState` instead of `AppData`
 - All components using individual store types instead of monolithic `AppData`
-- **Removed**: Reference to `@/stores/app-data/types`
+- **Removed**: Reference to `@web/stores/app-data/types`
 
 ### 4.2 Import Cleanup
 ✅ **Status**: Complete
 
 **Removed Imports**:
-- `import { AppData } from '@/types'` - Removed from all components
-- `import { useAppData } from '@/hooks/use-app-data'` - Deleted, no longer exists
-- `import { useAppDataStore } from '@/stores/app-data'` - Deleted store removed
-- All `import { getCurrentData } from '@/stores/app-data'` - Deleted utility removed
+- `import { AppData } from '@web/types'` - Removed from all components
+- `import { useAppData } from '@web/hooks/use-app-data'` - Deleted, no longer exists
+- `import { useAppDataStore } from '@web/stores/app-data'` - Deleted store removed
+- All `import { getCurrentData } from '@web/stores/app-data'` - Deleted utility removed
 
 **New Imports** (in all components):
 - Individual store hooks: `useJournal`, `useCdagTopology`, `usePlayerStatistics`, etc.

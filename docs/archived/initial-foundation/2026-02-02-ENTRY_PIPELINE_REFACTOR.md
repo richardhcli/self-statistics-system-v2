@@ -5,7 +5,7 @@
 ## Overview
 Completed comprehensive refactor of entry processing utilities following the **Architecture Protocol: /lib vs /stores**.
 
-Moved text-to-graph transformation logic from `@/utils/text-to-topology` into the **soul topology domain** at `@/lib/soulTopology/utils/entry-pipeline`, establishing a pure, testable entry processing pipeline.
+Moved text-to-graph transformation logic from `@web/utils/text-to-topology` into the **soul topology domain** at `@web/lib/soulTopology/utils/entry-pipeline`, establishing a pure, testable entry processing pipeline.
 
 ## What Changed
 
@@ -35,8 +35,8 @@ src/lib/soulTopology/utils/entry-pipeline/
 
 #### Old Import Pattern
 ```typescript
-import { aiEntryAnalyzer } from '@/utils/text-to-topology/ai-entry-analyzer';
-import { buildIncomingTopologyFromActions } from '@/utils/text-to-topology/build-incoming-topology-from-actions';
+import { aiEntryAnalyzer } from '@web/utils/text-to-topology/ai-entry-analyzer';
+import { buildIncomingTopologyFromActions } from '@web/utils/text-to-topology/build-incoming-topology-from-actions';
 ```
 
 #### New Import Pattern
@@ -47,7 +47,7 @@ import {
   transformAnalysisToTopology,
   type EntryOrchestratorContext,
   type AnalyzeEntryResult
-} from '@/lib/soulTopology';
+} from '@web/lib/soulTopology';
 ```
 
 ### Function Name Changes
@@ -135,8 +135,8 @@ expect(fragment.edges).toHaveLength(3);
 ```
 
 ## Backward Compatibility
-⚠️ **BREAKING**: All imports from `@/utils/text-to-topology` will fail. 
-- Update all references to use `@/lib/soulTopology`
+⚠️ **BREAKING**: All imports from `@web/utils/text-to-topology` will fail. 
+- Update all references to use `@web/lib/soulTopology`
 - Function names have changed (use new names above)
 
 ## Next Steps
