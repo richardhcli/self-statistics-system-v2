@@ -1,6 +1,7 @@
 # self-statistics-system-v2: The Neural Second Brain
 
-self statistics system is a high-fidelity personal growth platform that transforms unstructured thoughts (voice recordings) into experience and level updates representing current state, in order to create a status screen for the user. 
+self statistics system is a self motivation system inspiried by gaming systems.
+This is done by maintaining a status screen of the user, including proper updating (progression) channels.
 It leverages the **Google Gemini API** to classify human effort and visualizes progress through a stable **Directed Acyclic Graph (DAG)**.
 
 Project URL: https://self-statistics-system-v2.web.app

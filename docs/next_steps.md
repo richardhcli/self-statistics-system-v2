@@ -80,3 +80,39 @@ Requirements for transforming the app into a multi-user platform.
 - [ ] **Native Mobile App**: Capacitor/React Native shell for push notification support.
 - [ ] **Inbound Webhooks**: Allow external devices (Apple Watch, external API calls) to push data into the Brain.
 - [ ] **Outbound Webhooks**: Call external APIs upon new data, especially new status gains. 
+
+
+
+## Long-Term Refactoring Plan (The Isomorphic Workspace)
+
+This plan transitions your current frontend-only setup into a fully device-independent platform.
+
+**Phase 1: Foundation & Workspace Initialization**
+
+1. Convert the root directory into a native npm/pnpm workspace.
+2. Move the existing React application into an `apps/web` directory.
+3. Establish the `packages/` directory for all environment-agnostic code.
+
+**Phase 2: Isomorphic Logic Extraction (The "Brain")**
+
+1. Create `packages/schemas` using Zod to define your core data contracts (e.g., Journal Entries, User Stats).
+2. Create `packages/systems` for pure data manipulation functions (parsing, statistical calculations, tag extraction).
+3. Update the React app to import validation and logic exclusively from these shared packages.
+
+**Phase 3: State & Storage Decoupling**
+
+1. Create `packages/state`.
+2. Relocate your Zustand stores and IndexedDB synchronization logic here.
+3. Refactor the state layer to accept the storage mechanism (IndexedDB vs. SQLite) as an injected dependency, preparing for mobile.
+
+**Phase 4: Cloud & API Integration**
+
+1. Initialize Firebase Functions within `apps/api-cloud`.
+2. Connect `apps/api-cloud` to the workspace to consume `packages/schemas` and `packages/systems`.
+3. Implement an API Client wrapper in the frontend to route requests to either the local cache (offline) or Firebase Functions (online).
+
+**Phase 5: Platform Expansion**
+
+1. Introduce `apps/mobile` (React Native/Expo), consuming `packages/state` but injecting a native SQLite adapter.
+2. Introduce `apps/api-core` (Python).
+3. Generate Python Pydantic models from your TypeScript Zod schemas using an OpenAPI spec to maintain a single source of truth across languages.
