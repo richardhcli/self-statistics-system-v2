@@ -4,7 +4,7 @@
  * Centralized configuration for the entire progression math model.
  * Modify these to tune the "feel" of leveling and experience across the app.
  *
- * @module @systems/progression/constants
+ * @module @self-stats/progression-system/constants
  */
 
 /** AI temperature locked for deterministic topology generation. */

@@ -10,13 +10,13 @@
 
 import React, { useMemo } from 'react';
 import { Trophy, TrendingUp, Star } from 'lucide-react';
-import type { PlayerStatistics } from '../../../systems/progression';
+import type { PlayerStatistics } from '@self-stats/progression-system';
 import {
   PROGRESSION_ROOT_ID,
   getLevelForExp,
   getExpProgress,
   getExpForLevel,
-} from '../../../systems/progression';
+} from '@self-stats/progression-system';
 
 interface LevelViewProps {
   playerStatistics: PlayerStatistics;

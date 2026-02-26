@@ -9,10 +9,10 @@
  *
  * No React, no stores, no side-effects — unit-testable in isolation.
  *
- * @module @systems/progression/formulas
+ * @module @self-stats/progression-system/formulas
  */
 
-import { MINUTES_PER_EXP_UNIT, EXP_PRECISION } from './constants';
+import { MINUTES_PER_EXP_UNIT, EXP_PRECISION } from './constants.js';
 
 // ─── Helpers ───────────────────────────────────────────────────────
 
@@ -27,11 +27,6 @@ export const roundExp = (n: number): number =>
  *
  * @param duration - Integer minutes OR legacy string ("1h30m").
  * @returns Multiplier where `MINUTES_PER_EXP_UNIT` minutes = 1.0.
- *
- * @example
- * parseDurationToMultiplier(60)  // → 2.0
- * parseDurationToMultiplier(30)  // → 1.0
- * parseDurationToMultiplier()    // → 1.0
  */
 export const parseDurationToMultiplier = (duration?: number | string): number => {
   if (!duration) return 1.0;
@@ -40,7 +35,6 @@ export const parseDurationToMultiplier = (duration?: number | string): number =>
     return roundExp(duration / MINUTES_PER_EXP_UNIT);
   }
 
-  // Legacy string fallback (for user overrides like "1h30m")
   const lower = duration.toLowerCase();
   let minutes = 0;
 
@@ -85,16 +79,6 @@ export const scaleExperience = (
  * Logarithmic level curve.
  *
  * `Level = floor(log2(totalExp + 1))`
- *
- * Properties:
- * - Level 0 → 0 EXP
- * - Level 1 → 1 EXP
- * - Level 2 → 3 EXP
- * - Level 3 → 7 EXP
- * - Level 10 → 1023 EXP
- *
- * @param totalExp - Cumulative experience for a node.
- * @returns Integer level (≥ 0).
  */
 export const getLevelForExp = (totalExp: number): number =>
   Math.floor(Math.log2(totalExp + 1));
@@ -102,9 +86,6 @@ export const getLevelForExp = (totalExp: number): number =>
 /**
  * Fractional progress toward the next level (0 → 1).
  * Useful for rendering EXP bars.
- *
- * @param totalExp - Cumulative experience for a node.
- * @returns Progress as a 4-dp decimal (e.g. 0.4567).
  */
 export const getExpProgress = (totalExp: number): number => {
   const currentLevel = getLevelForExp(totalExp);
@@ -117,8 +98,5 @@ export const getExpProgress = (totalExp: number): number => {
 
 /**
  * EXP required to reach a specific level.
- *
- * @param level - Target level.
- * @returns Minimum cumulative EXP to reach that level.
  */
 export const getExpForLevel = (level: number): number => 2 ** level - 1;

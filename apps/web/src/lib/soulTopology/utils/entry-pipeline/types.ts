@@ -1,5 +1,4 @@
-import { GraphState } from '../../../../types';
-import { GeneralizationLink, TextToActionResponse } from '../../types';
+import type { GraphState, GeneralizationLink, TextToActionResponse } from '@self-stats/contracts';
 
 /**
  * EntryOrchestratorContext

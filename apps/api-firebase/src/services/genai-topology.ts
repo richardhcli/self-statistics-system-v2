@@ -1,24 +1,8 @@
 import {GoogleGenAI} from "@google/genai";
 import * as logger from "firebase-functions/logger";
+import { type TextToActionResponse } from "@self-stats/contracts";
 
-export interface WeightedAction {
-  label: string;
-  weight: number;
-}
-
-export interface MappingEdge {
-  child: string;
-  parent: string;
-  weight: number;
-}
-
-export interface TopologyResponse {
-  durationMinutes: number;
-  weightedActions: WeightedAction[];
-  skillMappings: MappingEdge[];
-  characteristicMappings: MappingEdge[];
-  generalizationChain: MappingEdge[];
-}
+export type TopologyResponse = TextToActionResponse;
 
 const MODEL_CANDIDATES = ["gemini-3-flash-preview", "gemini-2.0-flash"] as const;
 

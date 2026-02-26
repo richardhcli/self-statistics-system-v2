@@ -1,8 +1,7 @@
 /**
  * Soul Topology Library Public API
  *
- * Exports entry-pipeline utilities (text → graph transformation).
- * Experience propagation has moved to @systems/progression/engine.
+ * Exports web-specific entry utilities and re-exports shared topology helpers.
  */
 
 export * from './utils/entry-pipeline';

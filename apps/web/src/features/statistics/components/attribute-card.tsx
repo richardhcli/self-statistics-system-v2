@@ -17,9 +17,8 @@ import {
   Sparkles,
   Crown,
 } from 'lucide-react';
-import type { CoreAttribute } from '../../../systems/progression';
-import { ATTRIBUTE_ICONS, ATTRIBUTE_DESCRIPTIONS } from '../../../systems/progression';
-import { getExpProgress } from '../../../systems/progression';
+import type { CoreAttribute } from '@self-stats/progression-system';
+import { ATTRIBUTE_ICONS, ATTRIBUTE_DESCRIPTIONS, getExpProgress } from '@self-stats/progression-system';
 
 /** Map icon name → Lucide component. */
 const ICON_MAP: Record<string, React.FC<{ className?: string }>> = {

@@ -17,6 +17,9 @@
     "emulator": "firebase emulators:start"
   },
   "dependencies": {
+    "@self-stats/contracts": "workspace:*",
+    "@self-stats/progression-system": "workspace:*",
+    "@self-stats/soul-topology": "workspace:*",
     "@google/genai": "^1.41.0",
     "@modelcontextprotocol/sdk": "^1.0.0",
     "firebase-admin": "^13.6.0",

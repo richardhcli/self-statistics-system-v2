@@ -28,8 +28,7 @@
  */
 
 export { analyzeEntry } from './analyze-entry';
-export { transformAnalysisToTopology } from './transform-analysis-to-topology';
-export { transformActionsToTopology } from './transform-actions-to-topology';
+export { transformAnalysisToTopology, transformActionsToTopology } from '@self-stats/soul-topology';
 export type {
 	EntryOrchestratorContext,
 	AiEntryAnalysisResult,

@@ -2,7 +2,8 @@
   "name": "self-statistics-system-v2",
   "private": true,
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "shared/*"
   ],
   "engines": {
     "node": "20"

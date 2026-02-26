@@ -4,9 +4,10 @@ import { usePlayerStatisticsActions } from '../stores/player-statistics';
 import { useUserInformationActions } from '../stores/user-information';
 import { useJournalActions } from '../stores/journal';
 import type { JournalEntryData } from '../stores/journal';
-import { analyzeEntry, transformActionsToTopology } from '../lib/soulTopology';
-import { calculateParentPropagation, parseDurationToMultiplier, scaleExperience } from '../systems/progression';
-import type { GraphState } from '../stores/cdag-topology';
+import { analyzeEntry } from '../lib/soulTopology';
+import { transformActionsToTopology } from '@self-stats/soul-topology';
+import { calculateParentPropagation, parseDurationToMultiplier, scaleExperience } from '@self-stats/progression-system';
+import type { GraphState } from '@self-stats/contracts';
 
 /**
  * Entry Orchestrator Hook

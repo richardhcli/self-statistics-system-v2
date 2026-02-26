@@ -38,3 +38,4 @@ export * as obsidian from "./plugins/obsidian-integration";
 export {obsidianApi} from "./plugins/obsidian-integration/api";
 export {obsidianWorker} from "./plugins/obsidian-integration/worker";
 export {journalPipeline} from "./plugins/journal-pipeline/api";
+export {processJournalEntry} from "./functions/process-journal-entry";

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { User, Trophy } from 'lucide-react';
-import type { PlayerStatistics } from '../../../systems/progression';
+import type { PlayerStatistics } from '@self-stats/progression-system';
 
 interface PlayerStatsViewProps {
   stats: PlayerStatistics;

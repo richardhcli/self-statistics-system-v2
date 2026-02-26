@@ -41,23 +41,23 @@
     - Move Firestore schema definitions.
     - Export everything via `src/index.ts`.
 
-### 2.2 Create `shared/progression`
+### 2.2 Create `shared/progressionSystem`
 - **Purpose**: EXP calculations, leveling formulas, and stat normalization.
 - **Location**: `shared/progression`
 - **Actions**:
-    - Initialize `package.json` (name: `@self-stats/progression`).
+    - Initialize `package.json` (name: `@self-stats/progression-system`).
     - **Move** `apps/web/src/systems/progression/formulas.ts` -> `shared/progression/src/formulas.ts`.
     - **Move** `apps/web/src/systems/progression/constants.ts` -> `shared/progression/src/constants.ts`.
     - **Move** `apps/web/src/systems/progression/engine.ts` -> `shared/progression/src/engine.ts`.
     - **Refactor**: Ensure these files rely only on `@self-stats/contracts` and have **no** React/Zustand dependencies.
     - Export via `src/index.ts`.
 
-### 2.3 Create `shared/topology`
+### 2.3 Create `shared/soulTopology`
 - **Purpose**: Graph theory math, node weighting, and connection logic.
-- **Location**: `shared/topology`
+- **Location**: `shared/soul-topology`
 - **Actions**:
-    - Initialize `package.json` (name: `@self-stats/topology`).
-    - **Move** compatible logic from `apps/web/src/lib/soulTopology` -> `shared/topology/src/`.
+    - Initialize `package.json` (name: `@self-stats/soul-topology`).
+    - **Move** compatible logic from `apps/web/src/lib/soulTopology` -> `shared/soul-topology/src/`.
     - Ensure strict separation from visual rendering components.
     - Export via `src/index.ts`.
 
@@ -70,15 +70,15 @@
 1.  **Update `apps/api-firebase/package.json`**:
     - Add dependencies:
       - `@self-stats/contracts`
-      - `@self-stats/progression`
-      - `@self-stats/topology`
+      - `@self-stats/progression-system`
+      - `@self-stats/soul-topology`
 
 2.  **Implement `processJournalEntry` Cloud Function**:
     - **Input**: `{ rawText: string, timestamp: number }`.
     - **Logic**:
         1.  **AI Extraction**: Call Gemini (via `@google/genai`) to get structured data (keywords, sentiment).
-        2.  **Topology Processing**: Use `@self-stats/topology` to determine node connections/weights.
-        3.  **Progression Calculation**: Use `@self-stats/progression` to calculate EXP gain and Level updates.
+        2.  **Topology Processing**: Use `@self-stats/soul-topology` to determine node connections/weights.
+        3.  **Progression Calculation**: Use `@self-stats/progression-system` to calculate EXP gain and Level updates.
         4.  **Persistence**: Save the *final calculated state* to Firestore.
     - **Output**: `{ success: true, entryId: string, updates: NodeData[] }`.
 
@@ -91,18 +91,18 @@
 1.  **Update `apps/web/package.json`**:
     - Add dependencies:
       - `@self-stats/contracts`
-      - `@self-stats/progression`
-      - `@self-stats/topology`
+      - `@self-stats/progression-system`
+      - `@self-stats/soul-topology`
 
 2.  **Refactor Imports**:
-    - Replace `../../systems/progression/*` imports with `@self-stats/progression`.
-    - Replace `../../lib/soulTopology` imports with `@self-stats/topology`.
+    - Replace `../../systems/progression/*` imports with `@self-stats/progression-system-system`.
+    - Replace `../../lib/soulTopology` imports with `@self-stats/soul-topology`.
     - Replace local type definitions with `@self-stats/contracts`.
 
 3.  **Implement Hybrid Sync in `JournalForm`**:
     - **Action 1 (Optimistic)**: Run accessible logic (regex/heuristics) locally. Calculate "Preview" EXP/Level using shared libs. Update UI immediately via Zustand/IndexedDB.
     - **Action 2 (Async)**: Call `processJournalEntry` cloud function.
-    - **Action 3 (Reconciliation)**: When Cloud Function returns, replace local optimistic state with the server-verified state (which used the *same* formulas but better AI data).
+    - **Action 3 (Reconciliation)**: When Cloud Function returns, replace local optimistic state with the server-verified state (which used the *same* formulas but better AI data). 
 
 ---
 
@@ -113,8 +113,8 @@
     ```json
     "paths": {
       "@self-stats/contracts": ["shared/contracts/src/index.ts"],
-      "@self-stats/progression": ["shared/progression/src/index.ts"],
-      "@self-stats/topology": ["shared/topology/src/index.ts"]
+      "@self-stats/progression-system": ["shared/progression/src/index.ts"],
+      "@self-stats/soul-topology": ["shared/topology/src/index.ts"]
     }
     ```
 2.  **Update App Configs**:
@@ -123,3 +123,104 @@
 
 3.  **Validation**:
     - Run `npm run build` in all packages to ensure no circular dependencies or missing types.
+
+---
+
+## implementation-record
+
+**Completed by**: AI agent (two sessions  2026-02-25)
+**Status**: FULLY IMPLEMENTED
+
+### Packages created
+
+| Package | Location | Purpose |
+|---|---|---|
+| `@self-stats/contracts` | `shared/contracts/src/` | Pure TS interfaces: CDAG graph types, AI payload types, Firestore schemas |
+| `@self-stats/progression-system` | `shared/progression-system/src/` | EXP math: constants, formulas, PWCA engine, state-mutations, orchestrator |
+| `@self-stats/soul-topology` | `shared/soul-topology/src/` | Graph transforms: action/analysis to GraphState fragments |
+
+### Files created / modified
+
+**Root and config**
+- `package.json` - added `"shared/*"` to workspaces
+- `tsconfig.base.json` - created; defines `@self-stats/*` path aliases pointing to correct `shared/progression-system/` and `shared/soul-topology/` directories
+- `.ai/daily-logs/2026-02-25-backend-refactor.md` - session log
+
+**`shared/contracts/src/`** (created)
+- `graph.ts` - NodeType, NodeData, EdgeData, GraphState, CdagStructure, CdagMetadata, CdagStoreSnapshot
+- `topology.ts` - WeightedAction, GeneralizationLink, TextToActionResponse
+- `firestore.ts` - UserProfile, AISettings, UIPreferences, PlayerStatisticsDoc, billing/privacy/integration types
+- `index.ts` - barrel re-export with module-level JSDoc
+
+**`shared/progression-system/src/`** (created)
+- `constants.ts` - CORE_ATTRIBUTES, PROGRESSION_ROOT_ID, EXP tuning constants
+- `formulas.ts` - parseDurationToMultiplier, scaleExperience, getLevelForExp, getExpProgress, getExpForLevel
+- `engine.ts` - calculateParentPropagation (PWCA BFS algorithm)
+- `state-mutations.ts` - NodeStats, PlayerStatistics, updatePlayerStatsState
+- `orchestrator.ts` - calculateScaledProgression, calculateDirectProgression
+- `index.ts` - barrel re-export with module-level JSDoc
+
+**`shared/soul-topology/src/`** (created)
+- `entry-pipeline/types.ts` - EntryOrchestratorContext, AiEntryAnalysisResult, AnalyzeEntryResult
+- `entry-pipeline/transform-analysis-to-topology.ts` - transformAnalysisToTopology
+- `entry-pipeline/transform-actions-to-topology.ts` - transformActionsToTopology
+- `entry-pipeline/index.ts` - barrel re-export
+- `index.ts` - barrel re-export with module-level JSDoc
+
+**`apps/api-firebase/`** (modified)
+- `package.json` - added @self-stats/* workspace dependencies
+- `src/functions/process-journal-entry.ts` - processJournalEntry Cloud Function (NEW)
+- `src/index.ts` - exports processJournalEntry
+
+**`apps/web/`** (modified)
+- `package.json` - added @self-stats/* workspace dependencies
+- `src/systems/progression/` - DELETED (moved to `shared/progression-system`)
+- `src/lib/soulTopology/utils/entry-pipeline/transform-*.ts` - DELETED (moved to `shared/soul-topology`)
+- `src/lib/soulTopology/types.ts` - re-exports from `@self-stats/contracts`
+- `src/lib/soulTopology/utils/entry-pipeline/index.ts` - imports from `@self-stats/soul-topology`
+- `src/hooks/use-entry-orchestrator.ts` - imports from `@self-stats/progression-system`
+- `src/stores/player-statistics/store.ts` - imports from `@self-stats/progression-system`
+- `src/stores/player-statistics/types.ts` - re-exports from `@self-stats/progression-system`
+- `src/stores/cdag-topology/types.ts` - re-exports from `@self-stats/contracts`
+- `src/types/index.ts` - re-exports from `@self-stats/progression-system` and `@self-stats/contracts`
+- `src/features/statistics/components/level-view.tsx` - imports from `@self-stats/progression-system`
+- `src/features/statistics/components/status-view.tsx` - imports from `@self-stats/progression-system`
+- `src/features/statistics/components/attribute-card.tsx` - imports from `@self-stats/progression-system`
+- `src/features/statistics/utils/group-skills.ts` - imports from `@self-stats/progression-system`
+- `src/features/debug/components/player-stats-view.tsx` - imports from `@self-stats/progression-system`
+
+### Deviations from original plan
+
+1. Directory names match npm package names: `shared/progression-system` and `shared/soul-topology` instead of `shared/progression` and `shared/topology`
+2. tsconfig.base.json paths corrected to point at `shared/progression-system/` and `shared/soul-topology/` (original plan had stale paths)
+3. All `shared/*` files received heavy JSDoc on every exported type, field, and function parameter
+
+
+---
+
+## Implementation Record (2026-02-25)
+
+**Status**: FULLY IMPLEMENTED
+
+### Packages Created
+
+- `@self-stats/contracts` at `shared/contracts/` - graph types, topology contracts, Firestore schemas
+- `@self-stats/progression-system` at `shared/progression-system/` - PWCA engine, formulas, state-mutations, orchestrator
+- `@self-stats/soul-topology` at `shared/soul-topology/` - transformAnalysisToTopology, transformActionsToTopology
+
+### Key Deviations from Plan
+1. Directories use `shared/progression-system/` and `shared/soul-topology/` (not `shared/progression/` / `shared/topology/`)
+2. tsconfig.base.json paths corrected to match actual directory names
+3. All `shared/*` source files received heavy JSDoc on every exported type, field, and function
+
+### Web App Files Refactored (imports now use `@self-stats/*`)
+- hooks/use-entry-orchestrator.ts, stores/player-statistics/*, stores/cdag-topology/types.ts
+- features/statistics/components/level-view.tsx, status-view.tsx, attribute-card.tsx
+- features/statistics/utils/group-skills.ts, features/debug/components/player-stats-view.tsx
+- lib/soulTopology/types.ts, lib/soulTopology/utils/entry-pipeline/index.ts, types/index.ts
+
+### Backend
+- `apps/api-firebase/src/functions/process-journal-entry.ts` - processJournalEntry Cloud Function (NEW)
+
+
+

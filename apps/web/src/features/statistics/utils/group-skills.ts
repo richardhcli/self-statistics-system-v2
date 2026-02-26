@@ -8,8 +8,8 @@
  * @module features/statistics/utils/group-skills
  */
 
-import type { NodeData, EdgeData } from '../../../stores/cdag-topology/types';
-import type { PlayerStatistics } from '../../../systems/progression';
+import type { NodeData, EdgeData } from '@self-stats/contracts';
+import type { PlayerStatistics } from '@self-stats/progression-system';
 
 /** A single skill with its resolved stats. */
 export interface SkillEntry {

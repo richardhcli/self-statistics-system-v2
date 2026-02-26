@@ -13,6 +13,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@self-stats/contracts": "workspace:*",
+    "@self-stats/progression-system": "workspace:*",
+    "@self-stats/soul-topology": "workspace:*",
     "@google/genai": "^1.41.0",
     "d3": "^7.9.0",
     "firebase": "^12.9.0",

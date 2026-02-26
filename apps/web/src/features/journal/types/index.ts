@@ -25,7 +25,7 @@ import {
   JournalEntryStatus,
   JournalTreeStructure,
 } from '../../../stores/journal/types';
-import type { TextToActionResponse, WeightedAction } from '../../../lib/soulTopology/types';
+import type { TextToActionResponse, WeightedAction } from '@self-stats/contracts';
 
 // ============================================================
 // FEATURE-LEVEL LOCAL STATE (React Component State)

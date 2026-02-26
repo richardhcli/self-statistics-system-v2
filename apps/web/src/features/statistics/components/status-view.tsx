@@ -9,13 +9,10 @@
 
 import React, { useMemo } from 'react';
 import { Zap, Activity } from 'lucide-react';
-import type { NodeData, EdgeData } from '../../../stores/cdag-topology/types';
-import type { PlayerStatistics } from '../../../systems/progression';
+import type { NodeData, EdgeData } from '@self-stats/contracts';
+import type { PlayerStatistics } from '@self-stats/progression-system';
 import type { JournalEntryData } from '../../../stores/journal/types';
-import {
-  CORE_ATTRIBUTES,
-  getLevelForExp,
-} from '../../../systems/progression';
+import { CORE_ATTRIBUTES, getLevelForExp } from '@self-stats/progression-system';
 import { AttributeRadarChart } from './attribute-radar-chart';
 import type { RadarDataPoint } from './attribute-radar-chart';
 import { AttributeCard } from './attribute-card';

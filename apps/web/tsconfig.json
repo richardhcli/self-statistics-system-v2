@@ -1,4 +1,5 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "target": "ES2022",
     "experimentalDecorators": true,
@@ -21,13 +22,17 @@
     "allowJs": true,
     "jsx": "react-jsx",
     //With "baseUrl": "./", TypeScript will look for files starting at the same folder as the tsconfig.json:
+    "baseUrl": "./",
     "paths": {
       "@web/*": [
-        "./apps/web/src/*"
+        "src/*"
       ],
       "@systems/*": [
-        "./apps/web/src/systems/*"
-      ]
+        "src/systems/*"
+      ],
+      "@self-stats/contracts": ["../../shared/contracts/src/index.ts"],
+      "@self-stats/progression-system": ["../../shared/progression-system/src/index.ts"],
+      "@self-stats/soul-topology": ["../../shared/soul-topology/src/index.ts"]
     },
     "allowImportingTsExtensions": true,
     "noEmit": true

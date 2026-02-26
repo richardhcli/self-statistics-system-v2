@@ -1,8 +1,8 @@
 /**
  * Player Statistics Types
  *
- * Canonical definitions live in @systems/progression/state-mutations.
+ * Canonical definitions live in @self-stats/progression-system/state-mutations.
  * Re-exported here so store-level consumers keep working.
  */
 
-export { type NodeStats, type PlayerStatistics } from '../../systems/progression';
+export { type NodeStats, type PlayerStatistics } from '@self-stats/progression-system';
