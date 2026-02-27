@@ -1,3 +1,7 @@
+Author: Richard Li
+Last updated: 2026-02-26
+
+
 Technical Decision Record: Migrating to pnpm
 1. Architectural Justification
 The Self Statistics System is transitioning from a standard npm structure to pnpm (Performant NPM). As the application evolves into a domain-driven monorepo (separating React frontends, Firebase Cloud Functions, and shared isomorphic logic), standard npm introduces critical bottlenecks and risks that pnpm natively solves.

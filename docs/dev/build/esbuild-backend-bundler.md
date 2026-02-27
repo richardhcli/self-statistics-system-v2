@@ -1,3 +1,6 @@
+Author: Richard Li
+Last updated: 2026-02-26
+
 # Architecture Guide: Backend Bundling in the Monorepo
 
 ## 1. The Monorepo Compilation Trap (Why We Bundle)
