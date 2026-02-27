@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getAuth, connectAuthEmulator, GoogleAuthProvider } from "firebase/auth";
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
 import { getAnalytics } from "firebase/analytics";
 
 /**
@@ -22,13 +23,31 @@ const firebaseConfig = {
   measurementId: "G-CRN9HWE33Y"
 };
 
-
+// 1. Initialize the core app
 const app = initializeApp(firebaseConfig);
 
-export const auth = getAuth(app);
+// 2. Initialize the specific services
 export const analytics = getAnalytics(app);
 export const db = getFirestore(app);
+export const functions = getFunctions(app);
+
+export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
 // Optional: Force account selection every time
 //googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+
+
+// 3. THE ENVIRONMENT SWITCH
+// Vite automatically sets import.meta.env.DEV to true ONLY when running `vite`
+if (import.meta.env.DEV) {
+  console.info("🛠️ DEV MODE: Routing Firebase traffic to local emulators...");
+  
+  // Note: Use '127.0.0.1' instead of 'localhost' to prevent IPv6 resolution bugs
+  connectFirestoreEmulator(db, '127.0.0.1', 8080);
+  connectFunctionsEmulator(functions, '127.0.0.1', 5001);
+  
+  // Auth emulator requires the http:// prefix
+  connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+}
