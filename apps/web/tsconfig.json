@@ -25,10 +25,7 @@
     "baseUrl": "./",
     "paths": {
       "@web/*": [
-        "src/*"
-      ],
-      "@systems/*": [
-        "src/systems/*"
+        "./src/*"
       ],
       "@self-stats/contracts": ["../../shared/contracts/src/index.ts"],
       "@self-stats/progression-system": ["../../shared/progression-system/src/index.ts"],

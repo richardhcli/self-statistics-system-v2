@@ -16,8 +16,8 @@ export default defineConfig(({ mode }) => {
       },
       resolve: {
         alias: {
-          '@': path.resolve(__dirname, './src'),
-          '@systems': path.resolve(__dirname, './src/systems'),
+          '@web': path.resolve(__dirname, './src')
+          // '@systems': path.resolve(__dirname, './src/systems'), //out of date
         }
       }
     };
