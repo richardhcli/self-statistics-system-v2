@@ -1,12 +1,6 @@
 import * as logger from "firebase-functions/logger";
 import {onRequest} from "firebase-functions/v2/https";
-import * as admin from "firebase-admin";
-
-// Ensure Admin SDK is initialized (if not already done in index.ts or sdk.ts)
-if (!admin.apps.length) {
-  admin.initializeApp();
-}
-const db = admin.firestore();
+import {db} from "../services/admin-init";
 
 export const debugEndpoint = onRequest(async (req, res) => {
   // 1. Security: Simple API Key Check

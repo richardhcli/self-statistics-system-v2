@@ -1,5 +1,6 @@
-import * as admin from "firebase-admin";
 import {Timestamp} from "firebase-admin/firestore";
+import {db} from "../services/admin-init";
+import type {Firestore} from "firebase-admin/firestore";
 
 const serverTimestamp = (): Timestamp => Timestamp.now();
 
@@ -28,18 +29,15 @@ interface JobRecord {
  */
 export class PluginSDK {
   private readonly userId: string;
-  private readonly db: admin.firestore.Firestore;
+  private readonly db: Firestore;
 
   /**
    * Construct a plugin-scoped Firestore helper.
    * @param {string} userId user identifier scope
    */
   constructor(userId: string) {
-    if (!admin.apps.length) {
-      admin.initializeApp();
-    }
     this.userId = userId;
-    this.db = admin.firestore();
+    this.db = db;
   }
 
   /**

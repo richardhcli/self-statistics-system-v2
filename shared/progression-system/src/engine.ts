@@ -16,16 +16,10 @@
  * - **Deterministic**: same inputs always produce the same output.
  * - **Pure**: no side effects, no store access — trivially unit-testable.
  * - **Firebase-safe**: runs identically in Cloud Functions and the browser.
- *
- * @module @self-stats/progression-system/engine
  */
 
 import { type NodeData, type EdgeData } from '@self-stats/contracts';
-import { EXP_PRECISION } from './constants.js';
-
-/** Round a number to the configured EXP decimal precision. */
-const roundExp = (n: number): number =>
-  Math.round(n * 10 ** EXP_PRECISION) / 10 ** EXP_PRECISION;
+import { roundExp } from './formulas.js';
 
 /**
  * Build a lookup of `childId → { parentId: edgeWeight }` from the edge table.
@@ -103,16 +97,23 @@ export const calculateParentPropagation = (
     const queue: { label: string; weight: number }[] = [
       { label: actionLabel, weight: 1.0 },
     ];
+    /** Track visited nodes per seed to prevent infinite loops on cyclic edges. */
+    const visited = new Set<string>();
 
     while (queue.length > 0) {
       const { label, weight } = queue.shift()!;
+
+      if (visited.has(label)) continue;
+      visited.add(label);
 
       accumulatedSum[label] = (accumulatedSum[label] || 0) + seedValue * weight;
       contributionCount[label] = (contributionCount[label] || 0) + 1;
 
       const parents = parentMap[label] || {};
       Object.entries(parents).forEach(([parentLabel, edgeWeight]) => {
-        queue.push({ label: parentLabel, weight: weight * edgeWeight });
+        if (!visited.has(parentLabel)) {
+          queue.push({ label: parentLabel, weight: weight * edgeWeight });
+        }
       });
     }
   });

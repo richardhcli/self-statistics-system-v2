@@ -1,4 +1,4 @@
-import * as admin from "firebase-admin";
+import {db} from "./admin-init";
 import {Timestamp} from "firebase-admin/firestore";
 import * as logger from "firebase-functions/logger";
 
@@ -37,7 +37,6 @@ interface ManifestDocument {
   version?: number;
 }
 
-const db = admin.firestore();
 const GRAPH_ROOT = "progression";
 const GRAPH_BASE_PATH = "graphs/cdag_topology";
 const MANIFEST_COLLECTION = "graph_metadata";

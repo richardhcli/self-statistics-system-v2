@@ -41,9 +41,9 @@ export const obsidianWorker = onDocumentCreated("users/{uid}/jobs/{jobId}", asyn
     }
 
     const content = (entry as {content?: string} | undefined)?.content ?? "";
-    const duration = typeof durationPayload === "number"
-      ? durationPayload
-      : (entry as {metadata?: {duration?: number}} | undefined)?.metadata?.duration ?? 0;
+    const duration = typeof durationPayload === "number" ?
+      durationPayload :
+      (entry as {metadata?: {duration?: number}} | undefined)?.metadata?.duration ?? 0;
 
     if (!content) {
       throw new Error("Journal entry missing content");

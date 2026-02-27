@@ -1,12 +1,12 @@
 import {GoogleGenAI} from "@google/genai";
 import * as logger from "firebase-functions/logger";
-import { type TextToActionResponse } from "@self-stats/contracts";
+import {type TextToActionResponse} from "@self-stats/contracts";
 
 export type TopologyResponse = TextToActionResponse;
 
 const MODEL_CANDIDATES = ["gemini-3-flash-preview", "gemini-2.0-flash"] as const;
 
-const SINGLE_PROMPT_TOPOLOGY_PROMPT = (text: string) => `
+const buildTopologyPrompt = (text: string) => `
 You are an expert ontological architect. Analyze the journal entry to produce a structured semantic topology.
 
 # PIPELINE
@@ -80,7 +80,7 @@ export const generateTopology = async (text: string): Promise<TopologyResponse> 
       const result = (await withTimeout(
         client.models.generateContent({
           model,
-          contents: SINGLE_PROMPT_TOPOLOGY_PROMPT(text),
+          contents: buildTopologyPrompt(text),
           config: {
             temperature: 0,
             responseMimeType: "application/json",

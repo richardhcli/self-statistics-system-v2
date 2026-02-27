@@ -214,8 +214,8 @@ export interface NotificationSettings {
 export interface BillingSettings {
   /** Current subscription tier. `'free'` has usage caps; `'pro'` is unlimited. */
   plan: 'free' | 'pro' | 'enterprise';
-  /** Stripe subscription lifecycle state. */
-  status: 'active' | 'paused' | 'past_due' | 'canceled' | 'cancelled';
+  /** Stripe subscription lifecycle state. Uses American spelling per Stripe API. */
+  status: 'active' | 'paused' | 'past_due' | 'canceled';
   /** ISO 8601 or Firestore Timestamp of the upcoming billing cycle date. */
   nextBillingDate?: TimestampLike | FieldValueLike;
 }

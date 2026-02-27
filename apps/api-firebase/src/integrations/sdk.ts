@@ -1,9 +1,4 @@
-import * as admin from "firebase-admin";
-
-if (!admin.apps.length) {
-  admin.initializeApp();
-}
-const db = admin.firestore();
+import {db, FieldValue} from "../services/admin-init";
 
 /**
  * Legacy integration helpers for webhook-compatible clients.
@@ -24,7 +19,7 @@ export class IntegrationSDK {
       await db.collection(`users/${userId}/journal`).add({
         content: text,
         tags,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
         processed: true,
       });
     },
@@ -43,7 +38,7 @@ export class IntegrationSDK {
     async updateExp(userId: string, nodeId: string, amount: number): Promise<void> {
       const ref = db.doc(`users/${userId}/stats/${nodeId}`);
       await ref.set({
-        exp: admin.firestore.FieldValue.increment(amount),
+        exp: FieldValue.increment(amount),
       }, {merge: true});
     },
   };

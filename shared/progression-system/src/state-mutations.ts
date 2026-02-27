@@ -19,8 +19,6 @@
  * );
  * // Persist nextStats to Firestore / Zustand
  * ```
- *
- * @module @self-stats/progression-system/state-mutations
  */
 
 import { getLevelForExp, roundExp } from './formulas.js';

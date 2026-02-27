@@ -1,5 +1,4 @@
-import { onRequest } from "firebase-functions/v2/https";
-import * as admin from "firebase-admin";
+import {onRequest} from "firebase-functions/v2/https";
 import {
   calculateParentPropagation,
   parseDurationToMultiplier,
@@ -7,18 +6,13 @@ import {
   updatePlayerStatsState,
   type PlayerStatistics,
 } from "@self-stats/progression-system";
-import { transformAnalysisToTopology } from "@self-stats/soul-topology";
-import type { GraphNode, GraphEdge } from "../services/graph-writer";
-import { upsertGraph } from "../services/graph-writer";
-import { generateTopology } from "../services/genai-topology";
+import {transformAnalysisToTopology} from "@self-stats/soul-topology";
+import type {GraphNode, GraphEdge} from "../services/graph-writer";
+import {upsertGraph} from "../services/graph-writer";
+import {generateTopology} from "../services/genai-topology";
+import {db} from "../services/admin-init";
 
-if (admin.apps.length === 0) {
-  admin.initializeApp();
-}
-
-const db = admin.firestore();
-
-const DEFAULT_STATS: PlayerStatistics = { progression: { experience: 0, level: 1 } };
+const DEFAULT_STATS: PlayerStatistics = {progression: {experience: 0, level: 1}};
 
 const loadPlayerStats = async (userId: string): Promise<PlayerStatistics> => {
   const ref = db.doc(`users/${userId}/user_information/player_statistics`);
@@ -29,7 +23,7 @@ const loadPlayerStats = async (userId: string): Promise<PlayerStatistics> => {
 
 const persistPlayerStats = async (userId: string, stats: PlayerStatistics) => {
   const ref = db.doc(`users/${userId}/user_information/player_statistics`);
-  await ref.set({ stats, updatedAt: new Date().toISOString() }, { merge: true });
+  await ref.set({stats, updatedAt: new Date().toISOString()}, {merge: true});
 };
 
 const normalizeNodeType = (type?: string): GraphNode["type"] => {
@@ -39,13 +33,13 @@ const normalizeNodeType = (type?: string): GraphNode["type"] => {
 
 export const processJournalEntry = onRequest(async (req, res) => {
   if (req.method !== "POST") {
-    res.status(405).json({ error: "Method Not Allowed" });
+    res.status(405).json({error: "Method Not Allowed"});
     return;
   }
 
-  const { rawText, timestamp } = (req.body ?? {}) as { rawText?: string; timestamp?: number };
+  const {rawText, timestamp} = (req.body ?? {}) as { rawText?: string; timestamp?: number };
   if (!rawText || typeof rawText !== "string") {
-    res.status(400).json({ error: "Missing rawText" });
+    res.status(400).json({error: "Missing rawText"});
     return;
   }
 
@@ -82,7 +76,7 @@ export const processJournalEntry = onRequest(async (req, res) => {
     const scaledExpMap = scaleExperience(propagated, multiplier);
 
     const currentStats = await loadPlayerStats(userId);
-    const { nextStats, totalIncrease, levelsGained } = updatePlayerStatsState(
+    const {nextStats, totalIncrease, levelsGained} = updatePlayerStatsState(
       currentStats,
       scaledExpMap,
     );
@@ -135,6 +129,6 @@ export const processJournalEntry = onRequest(async (req, res) => {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    res.status(500).json({ error: message });
+    res.status(500).json({error: message});
   }
 });

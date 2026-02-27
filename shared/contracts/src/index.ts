@@ -20,6 +20,8 @@
  * @packageDocumentation
  */
 
+//`.js` required for moduleResolution: nodenext used by api-firebase)
+
 export * from './graph.js';
 export * from './topology.js';
 export * from './firestore.js';

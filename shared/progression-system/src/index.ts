@@ -64,5 +64,5 @@ export {
   type PlayerStatistics,
 } from './state-mutations.js';
 
-export { calculateScaledProgression, calculateDirectProgression } from './orchestrator.js';
+export { calculateScaledProgression, calculateDirectProgression, type ProgressionResult } from './orchestrator.js';
 

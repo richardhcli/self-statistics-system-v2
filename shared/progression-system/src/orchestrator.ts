@@ -18,8 +18,6 @@
  * - **`calculateDirectProgression`** — Use when you only have a list of
  *   action labels and want to grant equal raw EXP to each.  Used by the
  *   optimistic "preview" mode before AI results arrive.
- *
- * @module @self-stats/progression-system/orchestrator
  */
 
 import { type NodeData, type EdgeData } from '@self-stats/contracts';
@@ -32,7 +30,7 @@ import { updatePlayerStatsState, type PlayerStatistics } from './state-mutations
 /**
  * Unified result shape returned by both orchestrator functions.
  */
-interface ProgressionResult {
+export interface ProgressionResult {
   /** The new `PlayerStatistics` map after applying all EXP increases. */
   nextStats: PlayerStatistics;
   /** Total EXP added across the entire graph this session (rounded). */

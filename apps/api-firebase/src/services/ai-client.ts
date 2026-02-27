@@ -14,8 +14,8 @@ const buildGatewayUrl = (): string => {
 export const analyzeJournal = async (
   payload: {content: string; duration?: number},
 ): Promise<TopologyResponse> => {
-  const fetchFn: (input: string, init?: Record<string, unknown>) => Promise<any> =
-    (globalThis as unknown as {fetch?: (input: string, init?: Record<string, unknown>) => Promise<any>}).fetch ??
+  const fetchFn: (input: string, init?: Record<string, unknown>) => Promise<Response> =
+    (globalThis as unknown as {fetch?: (input: string, init?: Record<string, unknown>) => Promise<Response>}).fetch ??
     (() => {
       throw new Error("Fetch API not available in this runtime");
     });
