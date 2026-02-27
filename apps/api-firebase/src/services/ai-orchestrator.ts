@@ -1,10 +1,27 @@
+/**
+ * @file ai-orchestrator.ts
+ * @module api-firebase/services/ai-orchestrator
+ *
+ * AI orchestration layer: Gemini SDK calls + `AiProvider` adapter.
+ *
+ * Renamed from `genai-topology.ts`. This file:
+ * 1. Keeps all `@google/genai` logic (prompt, model fallback, timeout).
+ * 2. Exports `generateTopology()` for direct callers.
+ * 3. Exports `nodeAiProvider` — an `AiProvider` instance that the isomorphic
+ *    `analyzeAndTransform()` pipeline can consume.
+ */
+
 import {GoogleGenAI} from "@google/genai";
 import * as logger from "firebase-functions/logger";
 import {type TextToActionResponse} from "@self-stats/contracts";
+import {type AiProvider} from "@self-stats/soul-topology";
 
 export type TopologyResponse = TextToActionResponse;
 
-const MODEL_CANDIDATES = ["gemini-3-flash-preview", "gemini-2.0-flash"] as const;
+const MODEL_CANDIDATES = [
+  "gemini-3-flash-preview",
+  "gemini-2.0-flash",
+] as const;
 
 const buildTopologyPrompt = (text: string) => `
 You are an expert ontological architect. Analyze the journal entry to produce a structured semantic topology.
@@ -50,10 +67,17 @@ If a skill does not clearly fit any of the above, generate a specific, descripti
 ${JSON.stringify(text)}
 `;
 
-const withTimeout = async <T>(promise: Promise<T>, ms: number, label: string): Promise<T> => {
+const withTimeout = async <T>(
+  promise: Promise<T>,
+  ms: number,
+  label: string,
+): Promise<T> => {
   let timeoutId: NodeJS.Timeout | undefined;
   const timeoutPromise = new Promise<never>((_, reject) => {
-    timeoutId = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+    timeoutId = setTimeout(
+      () => reject(new Error(`${label} timed out after ${ms}ms`)),
+      ms,
+    );
   });
 
   try {
@@ -66,12 +90,21 @@ const withTimeout = async <T>(promise: Promise<T>, ms: number, label: string): P
 const getClient = (): GoogleGenAI => {
   const apiKey = process.env.GOOGLE_API_KEY || process.env.GENAI_API_KEY;
   if (!apiKey) {
-    throw new Error("GOOGLE_API_KEY not configured for ai-gateway");
+    throw new Error("GOOGLE_API_KEY not configured for ai-orchestrator");
   }
   return new GoogleGenAI({apiKey});
 };
 
-export const generateTopology = async (text: string): Promise<TopologyResponse> => {
+/**
+ * Call the Gemini model with structured output to generate a topology
+ * from raw journal text. Tries each model in `MODEL_CANDIDATES` with fallback.
+ *
+ * @param {string} text - Raw journal entry content.
+ * @return {Promise<TopologyResponse>} Parsed `TextToActionResponse`.
+ */
+export const generateTopology = async (
+  text: string,
+): Promise<TopologyResponse> => {
   const client = getClient();
   let lastError: unknown;
 
@@ -92,7 +125,10 @@ export const generateTopology = async (text: string): Promise<TopologyResponse> 
                   type: "array",
                   items: {
                     type: "object",
-                    properties: {label: {type: "string"}, weight: {type: "number"}},
+                    properties: {
+                      label: {type: "string"},
+                      weight: {type: "number"},
+                    },
                     required: ["label", "weight"],
                   },
                 },
@@ -100,7 +136,11 @@ export const generateTopology = async (text: string): Promise<TopologyResponse> 
                   type: "array",
                   items: {
                     type: "object",
-                    properties: {child: {type: "string"}, parent: {type: "string"}, weight: {type: "number"}},
+                    properties: {
+                      child: {type: "string"},
+                      parent: {type: "string"},
+                      weight: {type: "number"},
+                    },
                     required: ["child", "parent", "weight"],
                   },
                 },
@@ -108,7 +148,11 @@ export const generateTopology = async (text: string): Promise<TopologyResponse> 
                   type: "array",
                   items: {
                     type: "object",
-                    properties: {child: {type: "string"}, parent: {type: "string"}, weight: {type: "number"}},
+                    properties: {
+                      child: {type: "string"},
+                      parent: {type: "string"},
+                      weight: {type: "number"},
+                    },
                     required: ["child", "parent", "weight"],
                   },
                 },
@@ -116,7 +160,11 @@ export const generateTopology = async (text: string): Promise<TopologyResponse> 
                   type: "array",
                   items: {
                     type: "object",
-                    properties: {child: {type: "string"}, parent: {type: "string"}, weight: {type: "number"}},
+                    properties: {
+                      child: {type: "string"},
+                      parent: {type: "string"},
+                      weight: {type: "number"},
+                    },
                     required: ["child", "parent", "weight"],
                   },
                 },
@@ -132,19 +180,19 @@ export const generateTopology = async (text: string): Promise<TopologyResponse> 
           },
         }),
         120000,
-        `genai-topology ${model}`,
+        `ai-orchestrator ${model}`,
       )) as {response?: {text(): string}};
 
       const raw = result.response?.text();
-      logger.info(`genai-topology success with model ${model}`, {raw});
+      logger.info(`ai-orchestrator success with model ${model}`, {raw});
 
       const parsed = JSON.parse(raw ?? "{}") as Partial<TopologyResponse>;
       if (Object.keys(parsed).length === 0) {
-        logger.warn("genai-topology empty payload", {model, raw});
+        logger.warn("ai-orchestrator empty payload", {model, raw});
         throw new Error("Empty response from GenAI");
       }
 
-      logger.info("genai-topology parsed payload", {
+      logger.info("ai-orchestrator parsed payload", {
         model,
         duration: parsed.durationMinutes,
         actions: parsed.weightedActions?.length ?? 0,
@@ -166,5 +214,21 @@ export const generateTopology = async (text: string): Promise<TopologyResponse> 
     }
   }
 
-  throw new Error(`All GenAI models failed: ${lastError instanceof Error ? lastError.message : String(lastError)}`);
+  throw new Error(
+    `All GenAI models failed: ${
+      lastError instanceof Error ? lastError.message : String(lastError)
+    }`,
+  );
+};
+
+// ─── AiProvider adapter ────────────────────────────────────────────────────
+
+/**
+ * Node.js `AiProvider` implementation that delegates to `generateTopology`.
+ *
+ * Pass this to `analyzeAndTransform(nodeAiProvider, text)` so the shared
+ * soul-topology pipeline runs with the server-side Gemini SDK.
+ */
+export const nodeAiProvider: AiProvider = {
+  analyzeEntry: generateTopology,
 };

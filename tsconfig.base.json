@@ -4,7 +4,8 @@
     "paths": {
       "@self-stats/contracts": ["shared/contracts/src/index.ts"],
       "@self-stats/progression-system": ["shared/progression-system/src/index.ts"],
-      "@self-stats/soul-topology": ["shared/soul-topology/src/index.ts"]
+      "@self-stats/soul-topology": ["shared/soul-topology/src/index.ts"],
+      "@self-stats/plugin-sdk": ["shared/plugin-sdk/src/index.ts"]
     }
   }
 }

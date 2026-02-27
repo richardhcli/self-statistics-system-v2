@@ -12,9 +12,13 @@
  * |---------------------------------|------------------------------------------------------------------|
  * | `transformAnalysisToTopology`   | Full AI response → 3-layer `GraphState` (actions+skills+chars)   |
  * | `transformActionsToTopology`    | Action label list → minimal `GraphState` (leaf nodes only)       |
+ * | `analyzeAndTransform`           | Isomorphic AI → topology pipeline (accepts `AiProvider`)         |
+ * | `AiProvider`                    | DI interface for environment-specific AI calls                   |
  * | `EntryOrchestratorContext`      | Input type for the orchestrator hook                             |
  * | `AiEntryAnalysisResult`         | Intermediate type after the AI analysis step                     |
  * | `AnalyzeEntryResult`            | Final type returned to the caller                                |
+ * | `mergeFragmentIntoMaster`       | Pure merge of a topology fragment into the master graph          |
+ * | `accumulateEdgeWeight`          | Edge weight accumulation formula                                 |
  * | Re-exports from contracts       | `GraphState`, `NodeData`, `EdgeData`, `WeightedAction`, etc.     |
  *
  * ## Dependencies
@@ -34,3 +38,4 @@ export type {
 } from '@self-stats/contracts';
 
 export * from './entry-pipeline/index.js';
+export * from './graph-operations/index.js';

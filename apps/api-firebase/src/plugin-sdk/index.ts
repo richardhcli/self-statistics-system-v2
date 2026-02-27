@@ -1,6 +1,11 @@
 import {Timestamp} from "firebase-admin/firestore";
 import {db} from "../services/admin-init";
-import type {Firestore} from "firebase-admin/firestore";
+import {
+  createEntry,
+  getEntry,
+  updateEntry,
+} from "../data-access/journal-repo";
+import {incrementExp, getRawStats} from "../data-access/user-repo";
 
 const serverTimestamp = (): Timestamp => Timestamp.now();
 
@@ -26,10 +31,12 @@ interface JobRecord {
 /**
  * A constrained Firestore access layer for plugins.
  * Ensures every operation is scoped to a single user and known collections.
+ *
+ * Delegates to `data-access/` repos for journal and user operations.
+ * Job operations remain inline (not yet extracted to a repo).
  */
 export class PluginSDK {
   private readonly userId: string;
-  private readonly db: Firestore;
 
   /**
    * Construct a plugin-scoped Firestore helper.
@@ -37,11 +44,11 @@ export class PluginSDK {
    */
   constructor(userId: string) {
     this.userId = userId;
-    this.db = db;
   }
 
   /**
    * Access journal entry CRUD operations scoped to the user.
+   * Delegates to `data-access/journal-repo`.
    */
   get journal() {
     return {
@@ -51,20 +58,7 @@ export class PluginSDK {
       * @param {Record<string, unknown>} metadata optional metadata to merge
        */
       create: async (content: string, metadata: Record<string, unknown> = {}) => {
-        const ref = this.db
-          .collection(`users/${this.userId}/journal_entries`)
-          .doc();
-
-        const entry = {
-          id: ref.id,
-          content,
-          metadata,
-          createdAt: serverTimestamp(),
-          createdAtIso: new Date().toISOString(),
-        };
-
-        await ref.set(entry);
-        return ref.id;
+        return createEntry(this.userId, {content, metadata});
       },
 
       /**
@@ -72,11 +66,7 @@ export class PluginSDK {
       * @param {string} entryId journal document id
        */
       get: async (entryId: string) => {
-        const doc = await this.db
-          .doc(`users/${this.userId}/journal_entries/${entryId}`)
-          .get();
-
-        return doc.exists ? doc.data() : null;
+        return getEntry(this.userId, entryId);
       },
 
       /**
@@ -85,9 +75,7 @@ export class PluginSDK {
       * @param {Record<string, unknown>} data partial entry fields to merge
        */
       update: async (entryId: string, data: Record<string, unknown>) => {
-        await this.db
-          .doc(`users/${this.userId}/journal_entries/${entryId}`)
-          .set(data, {merge: true});
+        await updateEntry(this.userId, entryId, data);
       },
     };
   }
@@ -103,7 +91,7 @@ export class PluginSDK {
       * @param {Record<string, unknown>} payload job payload
        */
       create: async (type: string, payload: Record<string, unknown>) => {
-        const ref = this.db.collection(`users/${this.userId}/jobs`).doc();
+        const ref = db.collection(`users/${this.userId}/jobs`).doc();
 
         const job: JobRecord = {
           id: ref.id,
@@ -124,7 +112,7 @@ export class PluginSDK {
       * @param {string} jobId job document id
        */
       get: async (jobId: string) => {
-        const doc = await this.db
+        const doc = await db
           .doc(`users/${this.userId}/jobs/${jobId}`)
           .get();
 
@@ -151,7 +139,7 @@ export class PluginSDK {
           update.result = result;
         }
 
-        await this.db
+        await db
           .doc(`users/${this.userId}/jobs/${jobId}`)
           .update(update);
       },
@@ -160,36 +148,23 @@ export class PluginSDK {
 
   /**
    * Access gamification stats helpers scoped to the user.
+   * Delegates to `data-access/user-repo`.
    */
   get user() {
     return {
       /**
        * Increment player experience points.
-       */
-      /**
-       * Increment player experience points.
       * @param {number} deltaExp exp delta to apply
        */
       updateStats: async (deltaExp: number) => {
-        const ref = this.db.doc(`users/${this.userId}/user_information/player_statistics`);
-
-        await this.db.runTransaction(async (transaction) => {
-          const snapshot = await transaction.get(ref);
-          const currentExp = (snapshot.data()?.exp as number | undefined) ?? 0;
-
-          transaction.set(ref, {exp: currentExp + deltaExp}, {merge: true});
-        });
+        await incrementExp(this.userId, deltaExp);
       },
 
       /**
        * Retrieve the current player statistics document.
        */
       getStats: async () => {
-        const doc = await this.db
-          .doc(`users/${this.userId}/user_information/player_statistics`)
-          .get();
-
-        return doc.exists ? doc.data() : null;
+        return getRawStats(this.userId);
       },
     };
   }

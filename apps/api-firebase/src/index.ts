@@ -1,10 +1,13 @@
 /**
- * Import function triggers from their respective submodules:
+ * @file index.ts
+ * @module api-firebase
  *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
+ * Cloud Functions entry point. Exports all deployed endpoints.
  *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ * ## Architecture (post-overhaul)
+ * - `endpoints/callable/*` — `onCall` endpoints (Firebase Auth integrated)
+ * - `endpoints/rest/*`     — `onRequest` endpoints (API key auth, Phase 4)
+ * - `testing/*`            — Dev-only debug endpoints
  */
 
 import {setGlobalOptions} from "firebase-functions";
@@ -26,16 +29,13 @@ import {setGlobalOptions} from "firebase-functions";
 // this will be the maximum concurrent request count.
 setGlobalOptions({maxInstances: 10});
 
+// Callable (authenticated frontend endpoints)
+export {processJournalEntry} from "./endpoints/callable/journal";
+export {createUserApiKey, revokeUserApiKey} from "./endpoints/callable/api-keys";
 
-export {externalWebhook} from "./modules/bare-metal-api";
+// REST (external plugin endpoints)
+export {apiRouter} from "./endpoints/rest/api-router";
+export {obsidianWebhook} from "./endpoints/rest/obsidian-webhook";
+
+// Testing (dev only)
 export {debugEndpoint, helloWorld} from "./testing";
-
-// Microservices
-export {aiGateway} from "./microservices/ai-gateway";
-
-// Plugins
-export * as obsidian from "./plugins/obsidian-integration";
-export {obsidianApi} from "./plugins/obsidian-integration/api";
-export {obsidianWorker} from "./plugins/obsidian-integration/worker";
-export {journalPipeline} from "./plugins/journal-pipeline/api";
-export {processJournalEntry} from "./functions/process-journal-entry";

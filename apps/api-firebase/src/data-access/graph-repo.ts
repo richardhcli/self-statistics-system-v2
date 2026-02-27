@@ -1,6 +1,19 @@
-import {db} from "./admin-init";
+/**
+ * @file graph-repo.ts
+ * @module api-firebase/data-access/graph-repo
+ *
+ * Firestore data-access layer for the CDAG graph (nodes, edges, manifest).
+ *
+ * Extracted from `services/graph-writer.ts`. All raw `db.doc()` / `db.collection()`
+ * calls for graph data live here. The services layer calls these functions
+ * instead of touching Firestore directly.
+ */
+
+import {db} from "../services/admin-init";
 import {Timestamp} from "firebase-admin/firestore";
 import * as logger from "firebase-functions/logger";
+
+// ─── Types ─────────────────────────────────────────────────────────────────
 
 export type GraphNodeType = "action" | "skill" | "characteristic";
 
@@ -37,10 +50,14 @@ interface ManifestDocument {
   version?: number;
 }
 
+// ─── Constants ─────────────────────────────────────────────────────────────
+
 const GRAPH_ROOT = "progression";
 const GRAPH_BASE_PATH = "graphs/cdag_topology";
 const MANIFEST_COLLECTION = "graph_metadata";
 const MANIFEST_ID = "topology_manifest";
+
+// ─── Internal helpers ──────────────────────────────────────────────────────
 
 const normalizeWeight = (weight?: number): number => {
   if (typeof weight !== "number" || Number.isNaN(weight)) return 1;
@@ -140,6 +157,17 @@ const toEdgePayload = (edgeId: string, edge: GraphEdge) => {
   return payload;
 };
 
+// ─── Public API ────────────────────────────────────────────────────────────
+
+/**
+ * Upsert graph nodes and edges into Firestore, maintaining a manifest document
+ * with adjacency summaries and metrics.
+ *
+ * @param {string} userId - Firestore user scope.
+ * @param {GraphNode[]} nodes  - Graph nodes to upsert.
+ * @param {GraphEdge[]} edges  - Graph edges to upsert.
+ * @return {Promise<{nodeCount: number, edgeCount: number}>} Count of total nodes and edges after upsert.
+ */
 export const upsertGraph = async (
   userId: string,
   nodes: GraphNode[],
@@ -149,7 +177,7 @@ export const upsertGraph = async (
   const safeEdges = sanitizeEdges(edges);
 
   if (safeNodes.length !== nodes.length || safeEdges.length !== edges.length) {
-    logger.warn("graph-writer: filtered invalid entries", {
+    logger.warn("graph-repo: filtered invalid entries", {
       userId,
       inputNodes: nodes.length,
       safeNodes: safeNodes.length,
@@ -158,12 +186,16 @@ export const upsertGraph = async (
     });
   }
 
-  const manifestRef = db.doc(`users/${userId}/${GRAPH_BASE_PATH}/${MANIFEST_COLLECTION}/${MANIFEST_ID}`);
+  const manifestRef = db.doc(
+    `users/${userId}/${GRAPH_BASE_PATH}/${MANIFEST_COLLECTION}/${MANIFEST_ID}`,
+  );
   const nodesCol = db.collection(`users/${userId}/${GRAPH_BASE_PATH}/nodes`);
   const edgesCol = db.collection(`users/${userId}/${GRAPH_BASE_PATH}/edges`);
 
   const manifestSnap = await manifestRef.get();
-  const manifest = ensureManifest(manifestSnap.data() as ManifestDocument | undefined);
+  const manifest = ensureManifest(
+    manifestSnap.data() as ManifestDocument | undefined,
+  );
 
   mergeManifestNodes(manifest, safeNodes);
   mergeManifestEdges(manifest, safeEdges);

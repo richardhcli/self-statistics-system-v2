@@ -1,8 +1,8 @@
 # Action Plan: Backend Overhaul & SDK Migration
 
 **Date:** 2026-02-27  
-**Status:** In Progress  
-**Scope:** `apps/api-firebase/`, `shared/soul-topology/`, `shared/contracts/`
+**Status:** Complete (Phase 4.3 deferred)  
+**Scope:** `apps/api-firebase/`, `shared/soul-topology/`, `shared/contracts/`, `shared/plugin-sdk/`, `apps/obsidian-plugin/`
 
 ---
 

@@ -13,6 +13,27 @@
 
 import { type GraphState, type GeneralizationLink, type TextToActionResponse } from '@self-stats/contracts';
 
+// ─── AI provider injection ─────────────────────────────────────────────────
+
+/**
+ * Dependency-injection interface for AI topology generation.
+ *
+ * Implemented differently per environment:
+ * - **Backend (Node.js):** wraps `@google/genai` Gemini calls.
+ * - **Browser:** wraps a `fetch()` POST to the REST API.
+ *
+ * Injected into `analyzeAndTransform()` so the shared pipeline stays
+ * isomorphic — no direct SDK imports in `@self-stats/soul-topology`.
+ */
+export interface AiProvider {
+  /**
+   * Send journal text to the AI model and return the structured topology.
+   * @param text - Raw journal entry content.
+   * @returns Parsed AI response matching `TextToActionResponse`.
+   */
+  analyzeEntry(text: string): Promise<TextToActionResponse>;
+}
+
 // ─── Input context ─────────────────────────────────────────────────────────
 
 /**
