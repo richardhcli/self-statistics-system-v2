@@ -3,6 +3,7 @@ import React from 'react';
 import { ObsidianConfig } from '../../../types';
 import { useUserIntegrations, useUserIntegrationsActions } from '../../../stores/user-integrations';
 import { IntegrationHeader } from './integration-header';
+import { ConnectionCode } from './connection-code';
 import { WebhookConfig } from './webhook-config';
 import { ObsidianConfigPanel } from './obsidian-config';
 import { TransmissionLogs } from './transmission-logs';
@@ -65,6 +66,9 @@ const IntegrationView: React.FC = () => {
       <div className="grid grid-cols-1 gap-8">
         {/* Data Import/Export Utilities */}
         <DataPortability />
+
+        {/* External App Connection (Firebase Custom Token) */}
+        <ConnectionCode />
 
         {/* Network Configuration Form */}
         <WebhookConfig 

@@ -6,7 +6,7 @@
  *
  * ## Architecture (post-overhaul)
  * - `endpoints/callable/*` — `onCall` endpoints (Firebase Auth integrated)
- * - `endpoints/rest/*`     — `onRequest` endpoints (API key auth, Phase 4)
+ * - `endpoints/rest/*`     — `onRequest` endpoints (Bearer token auth)
  * - `testing/*`            — Dev-only debug endpoints
  */
 
@@ -31,7 +31,7 @@ setGlobalOptions({maxInstances: 10});
 
 // Callable (authenticated frontend endpoints)
 export {processJournalEntry} from "./endpoints/callable/journal";
-export {createUserApiKey, revokeUserApiKey} from "./endpoints/callable/api-keys";
+export {generateFirebaseAccessToken} from "./endpoints/callable/integration-auth";
 
 // REST (external plugin endpoints)
 export {apiRouter} from "./endpoints/rest/api-router";

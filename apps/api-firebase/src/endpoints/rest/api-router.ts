@@ -4,8 +4,8 @@
  *
  * REST endpoint for external plugin integrations.
  *
- * Replaces `modules/bare-metal-api.ts` with proper API key auth (Phase 4).
- * For now, uses `x-api-key` header validation via middleware.
+ * REST endpoint for external plugin integrations.
+ * Uses Firebase ID Token (Bearer) authentication via middleware.
  *
  * Routes:
  * - POST /journal — Process a journal entry externally.
@@ -14,15 +14,15 @@
 import {onRequest} from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import {processJournal} from "../../services/journal-service";
-import {authenticateApiKey} from "./middleware";
+import {authenticateRequest} from "./middleware";
 
 /**
  * REST API router for external integrations.
  *
- * Authenticates via `x-api-key` header using `authenticateApiKey` middleware.
+ * Authenticates via `Authorization: Bearer <ID_TOKEN>` header.
  */
 export const apiRouter = onRequest(async (req, res) => {
-  const userId = await authenticateApiKey(req, res);
+  const userId = await authenticateRequest(req, res);
   if (!userId) return; // 401 already sent
 
   try {

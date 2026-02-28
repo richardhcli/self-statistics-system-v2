@@ -2,74 +2,50 @@
  * @file middleware.ts
  * @module api-firebase/endpoints/rest/middleware
  *
- * REST endpoint middleware for API key authentication.
+ * REST endpoint middleware for Firebase ID Token (Bearer) authentication.
  *
- * Uses an in-memory cache with a 5-minute TTL to avoid Firestore reads
- * on every request. The cache lives for the lifetime of the Cloud Function
- * container — resets on cold start.
+ * Validates tokens signed by Google's Identity Platform using
+ * `admin.auth().verifyIdToken()`. No Firestore reads or custom caching
+ * required — signature verification is a local CPU operation backed by
+ * Google's auto-refreshed public-key cache.
+ *
+ * @see docs/dev/authentication/api-authentication-pipeline.md
  */
 
-import {validateApiKey} from "../../data-access/api-keys-repo";
+import {getAuth} from "firebase-admin/auth";
 import type {Request, Response} from "firebase-functions/v2/https";
-
-// ─── In-memory LRU cache ───────────────────────────────────────────────────
-
-interface CacheEntry {
-  userId: string;
-  expiresAt: number;
-}
-
-/** Cache keyed by SHA-256 hash. Lives for the container lifetime. */
-const keyCache = new Map<string, CacheEntry>();
-
-/** Cache TTL: 5 minutes. */
-const CACHE_TTL_MS = 5 * 60 * 1000;
 
 // ─── Middleware ─────────────────────────────────────────────────────────────
 
 /**
- * Express-style middleware that authenticates incoming requests via `x-api-key`.
+ * Express-style middleware that authenticates incoming requests via
+ * `Authorization: Bearer <ID_TOKEN>`.
  *
- * On success, sets `req.headers["x-user-id"]` to the authenticated user ID
- * so downstream handlers can read it.
- *
- * On failure, responds with 401 Unauthorized and terminates the request.
+ * On success, returns the authenticated `uid`.
+ * On failure, responds with 401 Unauthorized and returns `null`.
  *
  * @param {Request} req - Firebase Functions v2 request.
  * @param {Response} res - Firebase Functions v2 response.
  * @return {Promise<string|null>} authenticated userId or null (response already sent).
  */
-export const authenticateApiKey = async (
+export const authenticateRequest = async (
   req: Request,
   res: Response,
 ): Promise<string | null> => {
-  const rawKey = req.headers["x-api-key"] as string | undefined;
+  const authHeader = req.headers.authorization;
 
-  if (!rawKey) {
-    res.status(401).json({error: "Missing x-api-key header"});
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    res.status(401).json({error: "Missing Authorization header"});
     return null;
   }
 
-  // Check in-memory cache first (zero Firestore cost)
-  const now = Date.now();
-  const cached = keyCache.get(rawKey);
-  if (cached && cached.expiresAt > now) {
-    return cached.userId;
-  }
+  const idToken = authHeader.split("Bearer ")[1];
 
-  // Cache miss: validate against Firestore
-  const result = await validateApiKey(rawKey);
-
-  if (!result) {
-    res.status(401).json({error: "Invalid API key"});
+  try {
+    const decoded = await getAuth().verifyIdToken(idToken);
+    return decoded.uid;
+  } catch {
+    res.status(401).json({error: "Invalid or expired token"});
     return null;
   }
-
-  // Cache the result
-  keyCache.set(rawKey, {
-    userId: result.userId,
-    expiresAt: now + CACHE_TTL_MS,
-  });
-
-  return result.userId;
 };

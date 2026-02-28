@@ -1,6 +1,6 @@
 # Firebase Backend Auth
 
-**Last Updated**: February 10, 2026
+**Last Updated**: February 28, 2026
 
 ## Purpose
 Firebase Auth handles sign-in and the initial Firestore profile bootstrap. Authentication events trigger profile synchronization so the backend always has current user metadata.
@@ -8,6 +8,18 @@ Firebase Auth handles sign-in and the initial Firestore profile bootstrap. Authe
 ## Providers
 - **Google**: Primary sign-in. Configured in [src/lib/firebase/services.ts](../../src/lib/firebase/services.ts).
 - **Anonymous**: Guest sign-in for unauthenticated exploration. Can be upgraded to Google via account linking.
+
+## External Integration Auth (Custom Tokens)
+External clients (Obsidian plugin, CLI tools) authenticate via Firebase Custom Tokens:
+
+1. User generates a **Connection Code** from the web dashboard (Integrations tab).
+2. Backend mints a 1-hour Custom Token via `admin.auth().createCustomToken(uid)`.
+3. External client exchanges the token for a permanent session (ID Token + Refresh Token) via Google Identity Toolkit REST API.
+4. REST endpoints (`apiRouter`, `obsidianWebhook`) validate incoming `Authorization: Bearer <ID_TOKEN>` headers using `admin.auth().verifyIdToken()`.
+
+- Callable endpoint: [apps/api-firebase/src/endpoints/callable/integration-auth.ts](../../../apps/api-firebase/src/endpoints/callable/integration-auth.ts)
+- REST middleware: [apps/api-firebase/src/endpoints/rest/middleware.ts](../../../apps/api-firebase/src/endpoints/rest/middleware.ts)
+- Architecture doc: [docs/dev/authentication/api-authentication-pipeline.md](../authentication/api-authentication-pipeline.md)
 
 ## Flow
 1. UI triggers Google sign-in or anonymous guest login.

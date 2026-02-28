@@ -1,7 +1,7 @@
 # Action Plan: Google Auth Integration Pipeline (Custom Tokens)
 
 **Date:** 2026-02-28  
-**Status:** Approved for Implementation  
+**Status:** ✅ Implemented (Phases 1–4)  
 **Scope:** `apps/api-firebase`, `apps/web`
 
 ---
@@ -31,9 +31,10 @@ This is a new `onCall` (v2) Cloud Function. The web dashboard calls it to genera
 
 **Imports needed:** `onCall`, `HttpsError` from `firebase-functions/v2/https`; `getAuth` from `firebase-admin/auth`.
 
-**Function:** `generateIntegrationToken`
+**Function:** `generateFirebaseAccessToken`
 ```
-export const generateIntegrationToken = onCall(async (request) => {
+//generates is a one-time, 1-hour boarding pass - limitation of google auth. 
+export const generateFirebaseAccessToken = onCall(async (request) => {
   // 1. Guard: request.auth must exist (user must be logged in via Firebase Auth on the web app).
   //    If not → throw new HttpsError("unauthenticated", "Must be signed in.")
   
@@ -56,7 +57,7 @@ export {createUserApiKey, revokeUserApiKey} from "./endpoints/callable/api-keys"
 
 **Change to:**
 ```typescript
-export {generateIntegrationToken} from "./endpoints/callable/integration-auth";
+export {generateFirebaseAccessToken} from "./endpoints/callable/integration-auth";
 ```
 
 This removes the old API key exports and registers the new callable.
@@ -125,7 +126,7 @@ State:
 
 generateToken():
   - setLoading(true)
-  - const fn = httpsCallable(functions, "generateIntegrationToken")
+  - const fn = httpsCallable(functions, "generateFirebaseAccessToken")
   - const result = await fn()
   - setToken(result.data.token)
   - setLoading(false)
@@ -168,7 +169,7 @@ No new routes or stores needed. The component is self-contained with local state
 | File | Reason |
 |---|---|
 | `apps/api-firebase/src/data-access/api-keys-repo.ts` | SHA-256 hashing + `api_keys` collection logic — fully replaced by `verifyIdToken`. |
-| `apps/api-firebase/src/endpoints/callable/api-keys.ts` | `createUserApiKey` / `revokeUserApiKey` — replaced by `generateIntegrationToken`. |
+| `apps/api-firebase/src/endpoints/callable/api-keys.ts` | `createUserApiKey` / `revokeUserApiKey` — replaced by `generateFirebaseAccessToken`. |
 
 ### 4.2 Verify No Remaining Imports
 After deletion, run `tsc --noEmit` to confirm no dangling imports. The only consumers were:
@@ -197,7 +198,7 @@ This is documented here for completeness but is **out of scope** for the current
 
 | # | Task | Files |
 |---|---|---|
-| 1 | Create `generateIntegrationToken` callable | `endpoints/callable/integration-auth.ts` |
+| 1 | Create `generateFirebaseAccessToken` callable | `endpoints/callable/integration-auth.ts` |
 | 2 | Update `index.ts` exports (swap api-keys → integration-auth) | `index.ts` |
 | 3 | Rewrite `middleware.ts` (Bearer token auth) | `endpoints/rest/middleware.ts` |
 | 4 | Update `api-router.ts` import | `endpoints/rest/api-router.ts` |

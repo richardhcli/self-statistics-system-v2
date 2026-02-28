@@ -8,19 +8,21 @@
  * - POST: Ingest journal content → process immediately → return result.
  *   (Simplified from the old async job queue pattern to a synchronous pipeline.)
  *
- * Phase 4 will add API key authentication via middleware.
+ * Authentication: Firebase ID Token via `Authorization: Bearer <token>` header.
+ *
+ * @see docs/dev/authentication/api-authentication-pipeline.md
  */
 
 import {onRequest} from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import {processJournal} from "../../services/journal-service";
-import {authenticateApiKey} from "./middleware";
+import {authenticateRequest} from "./middleware";
 
 /**
  * Obsidian-specific REST webhook.
  *
  * POST body: `{ content: string, duration?: number }`
- * Authenticates via `x-api-key` header.
+ * Authenticates via `Authorization: Bearer <ID_TOKEN>` header.
  */
 export const obsidianWebhook = onRequest(async (req, res) => {
   if (req.method !== "POST") {
@@ -28,7 +30,7 @@ export const obsidianWebhook = onRequest(async (req, res) => {
     return;
   }
 
-  const userId = await authenticateApiKey(req, res);
+  const userId = await authenticateRequest(req, res);
   if (!userId) return; // 401 already sent
 
   const {content, duration} = (req.body || {}) as {
