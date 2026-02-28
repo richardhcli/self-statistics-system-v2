@@ -1,7 +1,7 @@
 
 Save this document to establish the definitive record of how external integrations authenticate with the Self Statistics System.
 
-Updated: 2026-02-27
+Updated: 2026-02-28
 
 # Architectural Guide: API Authentication Pipeline
 
@@ -49,3 +49,77 @@ When the 1-hour ID Token inevitably expires, the SDK handles the recovery invisi
 2. The SDK retrieves the permanent Refresh Token from local storage.
 3. The SDK makes an HTTP POST to the Google Secure Token API (`https://securetoken.googleapis.com/v1/token`) to silently request a fresh ID Token.
 4. The SDK saves the new tokens, attaches the fresh ID Token to the original journal entry request, and successfully completes the backend call.
+
+## 3. Client Implementation (SDK)
+
+Use `@self-stats/plugin-sdk` to handle exchange, refresh, and authenticated calls.
+
+```ts
+import {SelfStatsClient} from "@self-stats/plugin-sdk";
+
+// Provide project context and base URLs. backendUrl is the deployed Functions origin.
+const client = new SelfStatsClient({
+	projectId: "self-statistics-system-v2",
+	apiKey: process.env.FIREBASE_API_KEY!,
+	backendUrl: "https://us-central1-self-statistics-system-v2.cloudfunctions.net",
+	// storage: optional custom adapter; defaults to in-memory
+});
+
+// One-time: exchange the setup code (custom token) for an ID + refresh token
+await client.exchangeCustomToken("<setup-code-from-web-app>");
+
+// Later calls automatically refresh when needed
+await client.submitJournalEntry("Ran 5km", {timestamp: Date.now()});
+await client.submitObsidianNote("Daily note content", {duration: 45});
+```
+
+### Storage adapters
+
+- Node/CLI: supply a simple file-backed adapter so tokens survive restarts.
+- Obsidian: use `this.app.vault.adapter.read/write` or `this.manifest.dir` to persist.
+
+```ts
+const storage = {
+	async getItem(key: string) {
+		try { return await fs.promises.readFile(`/path/${key}`, "utf8"); } catch { return null; }
+	},
+	async setItem(key: string, value: string) {
+		await fs.promises.writeFile(`/path/${key}`, value, "utf8");
+	},
+	async removeItem(key: string) {
+		try { await fs.promises.unlink(`/path/${key}`); } catch { /* ignore */ }
+	},
+};
+
+const client = new SelfStatsClient({projectId, apiKey, backendUrl, storage});
+```
+
+### Direct REST debugging
+
+Exchange custom token (setup code):
+
+```
+curl -X POST \
+	"https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${FIREBASE_API_KEY}" \
+	-H "Content-Type: application/json" \
+	-d '{"token":"<SETUP_CODE>","returnSecureToken":true}'
+```
+
+Refresh ID token:
+
+```
+curl -X POST \
+	"https://securetoken.googleapis.com/v1/token?key=${FIREBASE_API_KEY}" \
+	-H "Content-Type: application/x-www-form-urlencoded" \
+	-d "grant_type=refresh_token&refresh_token=<REFRESH_TOKEN>"
+```
+
+Call backend with Bearer:
+
+```
+curl -X POST \
+	"https://us-central1-self-statistics-system-v2.cloudfunctions.net/apiRouter" \
+	-H "Content-Type: application/json" \
+	-H "Authorization: Bearer <ID_TOKEN>" \
+	-d '{"rawText":"Ran 5km"}'
+```
