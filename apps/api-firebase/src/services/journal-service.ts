@@ -18,8 +18,8 @@ import {
   scaleExperience,
   updatePlayerStatsState,
 } from "@self-stats/progression-system";
-import {analyzeAndTransform} from "@self-stats/soul-topology";
-import {nodeAiProvider, generateTopology} from "./ai-orchestrator";
+import {transformAnalysisToTopology} from "@self-stats/soul-topology";
+import {generateTopology} from "./ai-orchestrator";
 import {upsertGraph, type GraphNode, type GraphEdge} from "../data-access/graph-repo";
 import {loadPlayerStats, persistPlayerStats} from "../data-access/user-repo";
 import {createEntry} from "../data-access/journal-repo";
@@ -36,6 +36,14 @@ export interface JournalInput {
   timestamp?: number;
 }
 
+/** Per-node before/after delta for the API response. */
+export interface StatChange {
+  name: string;
+  oldValue: number;
+  newValue: number;
+  increase: number;
+}
+
 /** Result returned by `processJournal` to the endpoint. */
 export interface JournalResult {
   /** Auto-generated Firestore document ID. */
@@ -48,6 +56,8 @@ export interface JournalResult {
     levelsGained: number;
     nextStats: Record<string, unknown>;
   };
+  /** Per-node EXP deltas (old → new). */
+  statChanges: StatChange[];
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -79,11 +89,12 @@ export const processJournal = async (
 ): Promise<JournalResult> => {
   const {rawText, userId, timestamp} = input;
 
-  // 1. AI → GraphState fragment (uses shared isomorphic pipeline)
-  const graphFragment = await analyzeAndTransform(nodeAiProvider, rawText);
-
-  // Also get raw topology for metadata (duration, weights)
+  // 1. SINGLE AI call — generates topology AND feeds graph transform
   const topology = await generateTopology(rawText);
+  const graphFragment = transformAnalysisToTopology(
+    topology,
+    topology.generalizationChain ?? [],
+  );
 
   // 2. Build action weights
   const actionWeights: Record<string, number> = {};
@@ -119,6 +130,21 @@ export const processJournal = async (
     currentStats,
     scaledExpMap,
   );
+
+  // Build per-node deltas for the response
+  const statChanges: StatChange[] = Object.entries(scaledExpMap)
+    .filter(([, amount]) => amount > 0)
+    .map(([name, amount]) => {
+      const oldNode = currentStats[name] ?? {experience: 0};
+      const newNode = nextStats[name] ?? {experience: amount};
+      return {
+        name,
+        oldValue: oldNode.experience ?? 0,
+        newValue: (newNode as {experience: number}).experience,
+        increase: Math.round(amount * 100) / 100,
+      };
+    })
+    .sort((a, b) => b.increase - a.increase);
 
   await persistPlayerStats(userId, nextStats);
 
@@ -159,5 +185,6 @@ export const processJournal = async (
       levelsGained,
       nextStats: nextStats as unknown as Record<string, unknown>,
     },
+    statChanges,
   };
 };

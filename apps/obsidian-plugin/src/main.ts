@@ -8,7 +8,6 @@
  * - It initializes the `SelfStatsClient` SDK. Because Obsidian does not allow Node.js `fs` access,
  * we inject Obsidian's native `loadData()` and `saveData()` methods into the SDK's StorageAdapter.
  */
-
 import { Plugin } from 'obsidian';
 import { SelfStatsSettings, DEFAULT_SETTINGS } from './settings';
 import { SelfStatsSettingTab } from './ui/settings-tab';
@@ -17,42 +16,37 @@ import { SelfStatsClient, SelfStatsConfig, StorageAdapter } from '@self-stats/pl
 
 export default class SelfStatsPlugin extends Plugin {
     settings: SelfStatsSettings;
-    client: SelfStatsClient;
+    client: SelfStatsClient | null = null; // Fix: Allow client to be null initially
 
-    /**
-     * Called automatically by Obsidian when the plugin is enabled.
-     */
     async onload() {
-        // Load persisted settings, falling back to defaults
         this.settings = Object.assign({}, DEFAULT_SETTINGS, (await this.loadData()) as Partial<SelfStatsSettings>);
-        
-        // Boot the SDK with the loaded refresh token
         this.initializeSdk();
-
-        // Register external UI and Commands
         this.addSettingTab(new SelfStatsSettingTab(this.app, this));
         registerCommands(this);
     }
 
-    /**
-     * Rebuilds the SelfStatsClient. Called on load and whenever settings change.
-     */
     initializeSdk() {
-        // Inject Obsidian's file system into the platform-agnostic SDK
+        // Fix: If the required settings are missing on first load, safely abort initialization.
+        if (!this.settings.projectId || !this.settings.apiKey || !this.settings.backendUrl) {
+            this.client = null;
+            return;
+        }
+
         const storageAdapter: StorageAdapter = {
-            getRefreshToken: async () => this.settings.refreshToken,
-            setRefreshToken: async (token: string) => {
-                this.settings.refreshToken = token;
+            getItem: () => this.settings.authData,
+            setItem: async (key: string, value: string) => {
+                this.settings.authData = value;
                 await this.saveSettings();
             },
-            clearRefreshToken: async () => {
-                this.settings.refreshToken = null;
+            removeItem: async (key: string) => {
+                this.settings.authData = null;
                 await this.saveSettings();
             }
         };
 
         const config: SelfStatsConfig = {
-            firebaseApiKey: this.settings.firebaseApiKey,
+            projectId: this.settings.projectId,
+            apiKey: this.settings.apiKey,
             backendUrl: this.settings.backendUrl,
             storage: storageAdapter
         };
@@ -60,9 +54,6 @@ export default class SelfStatsPlugin extends Plugin {
         this.client = new SelfStatsClient(config);
     }
 
-    /**
-     * Persists the current settings object to `.obsidian/plugins/.../data.json`
-     */
     async saveSettings() {
         await this.saveData(this.settings);
     }

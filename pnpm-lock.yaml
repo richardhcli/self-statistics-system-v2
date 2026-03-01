@@ -203,6 +203,9 @@ importers:
       '@self-stats/contracts':
         specifier: workspace:*
         version: link:../contracts
+      tslib:
+        specifier: 2.4.0
+        version: 2.4.0
     devDependencies:
       typescript:
         specifier: ~5.8.2

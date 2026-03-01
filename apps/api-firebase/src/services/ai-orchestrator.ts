@@ -95,7 +95,7 @@ const getClient = (): GoogleGenAI => {
     throw new Error("GOOGLE_API_KEY not configured for ai-orchestrator");
   }
 
-  
+
   return new GoogleGenAI({apiKey});
 };
 

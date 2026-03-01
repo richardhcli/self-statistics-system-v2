@@ -27,7 +27,7 @@ export const db: Firestore = getFirestore(app);
 
 // Tell Firestore to silently strip 'undefined' properties before saving,
 // allowing seamless integration with TypeScript optional properties.
-db.settings({ ignoreUndefinedProperties: true });
+db.settings({ignoreUndefinedProperties: true});
 
 /**
  * Re-export `FieldValue` so consumers don't need a separate

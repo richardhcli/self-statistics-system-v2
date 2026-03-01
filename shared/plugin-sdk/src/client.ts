@@ -1,6 +1,15 @@
 /**
+ * @file client.ts
+ * @module @self-stats/plugin-sdk
+ * * @description
  * Universal client for Self Statistics using Firebase Custom Token auth.
- * Works in Node, Obsidian, and browsers with pluggable storage.
+ * * * AI CONTEXT & ARCHITECTURE NOTE:
+ * This SDK abstracts away the Google Identity Toolkit REST API. 
+ * External plugins (like Obsidian) only need to call `exchangeCustomToken()` once 
+ * with a 1-hour setup code. The SDK uses the injected `StorageAdapter` to save the 
+ * permanent Refresh Token.
+ * All subsequent calls to `submitJournalEntry()` will automatically handle ID Token 
+ * refresh cycles in the background.
  */
 
 export interface StorageAdapter {
@@ -38,8 +47,11 @@ export interface SubmitJournalOptions {
   timestamp?: number;
 }
 
-export interface SubmitObsidianOptions {
-  duration?: number;
+export interface StatChange {
+  name: string;
+  oldValue: number;
+  newValue: number;
+  increase: number;
 }
 
 export interface JournalEntryResponse {
@@ -51,23 +63,13 @@ export interface JournalEntryResponse {
     levelsGained: number;
     nextStats: Record<string, unknown>;
   };
-}
-
-export interface WebhookResponse {
-  success: boolean;
-  entryId: string;
-  graph: {nodeCount: number; edgeCount: number};
-  stats: {
-    totalIncrease: number;
-    levelsGained: number;
-    nextStats: Record<string, unknown>;
-  };
+  statChanges: StatChange[];
 }
 
 export interface TokenBundle {
   idToken: string;
   refreshToken: string;
-  expiresAt: number; // epoch seconds
+  expiresAt: number;
 }
 
 export class SelfStatsAuthError extends Error {
@@ -78,11 +80,7 @@ export class SelfStatsAuthError extends Error {
 }
 
 export class SelfStatsApiError extends Error {
-  constructor(
-    message: string,
-    public readonly status: number,
-    public readonly body: unknown,
-  ) {
+  constructor(message: string, public readonly status: number, public readonly body: unknown) {
     super(message);
     this.name = "SelfStatsApiError";
   }
@@ -90,15 +88,9 @@ export class SelfStatsApiError extends Error {
 
 class MemoryStorage implements StorageAdapter {
   private store = new Map<string, string>();
-  getItem(key: string) {
-    return this.store.get(key) ?? null;
-  }
-  setItem(key: string, value: string) {
-    this.store.set(key, value);
-  }
-  removeItem(key: string) {
-    this.store.delete(key);
-  }
+  getItem(key: string) { return this.store.get(key) ?? null; }
+  setItem(key: string, value: string) { this.store.set(key, value); }
+  removeItem(key: string) { this.store.delete(key); }
 }
 
 export class SelfStatsClient {
@@ -112,18 +104,40 @@ export class SelfStatsClient {
     if (!config.projectId) throw new Error("projectId is required");
     if (!config.apiKey) throw new Error("apiKey is required");
     if (!config.backendUrl) throw new Error("backendUrl is required");
+    
     this.apiKey = config.apiKey;
     this.backendUrl = config.backendUrl.replace(/\/+$/, "");
     this.storage = config.storage ?? new MemoryStorage();
-    const globalFetch = (globalThis as any).fetch as FetchLike | undefined;
+    
+    // Fix: Explicitly bind fetch to globalThis to prevent Illegal Invocation
+    const globalFetch = typeof globalThis.fetch === "function" 
+        ? globalThis.fetch.bind(globalThis) as FetchLike 
+        : undefined;
+
     const resolved = config.fetch ?? globalFetch;
     if (!resolved) throw new Error("fetch is not available; provide one in config");
+    
     this.fetchImpl = resolved;
     this.cacheKey = `selfstats:${config.projectId}:tokens`;
   }
 
+  /**
+   * Trades a 1-hour Custom Token for a permanent Refresh Token.
+   */
   async exchangeCustomToken(customToken: string): Promise<TokenBundle> {
-    const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${this.apiKey}`;
+    
+    // Check if we are pointing to a local backend'
+    // this is very useful for testing-debugging on local firebase emulator. 
+    const isLocal = this.backendUrl.includes("127.0.0.1") || this.backendUrl.includes("localhost");
+    
+    // Route to the Auth Emulator if local, otherwise use live production servers
+    const baseUrl = isLocal 
+      ? "http://127.0.0.1:9099/identitytoolkit.googleapis.com" 
+      : "https://identitytoolkit.googleapis.com";
+      
+    const url = `${baseUrl}/v1/accounts:signInWithCustomToken?key=${this.apiKey}`;    
+    
+    
     const res = await this.fetchImpl(url, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
@@ -131,44 +145,28 @@ export class SelfStatsClient {
     });
 
     if (!res.ok) {
-      const body = await safeJson(res);
-      throw new SelfStatsAuthError("Failed to exchange custom token", res.status);
+      const body = await safeJson(res) as any;
+      // Extract the exact Google Identity error message
+      const fbError = body?.error?.message || "Unknown Firebase Error";
+      throw new SelfStatsAuthError(`Exchange failed: ${fbError}`, res.status);
     }
 
-    const data = (await res.json()) as {
-      idToken: string;
-      refreshToken: string;
-    };
-
+    const data = (await res.json()) as { idToken: string; refreshToken: string; };
     const expiresAt = decodeExpiry(data.idToken);
-    const bundle: TokenBundle = {
-      idToken: data.idToken,
-      refreshToken: data.refreshToken,
-      expiresAt,
-    };
+    const bundle: TokenBundle = { idToken: data.idToken, refreshToken: data.refreshToken, expiresAt };
+    
     await this.saveTokens(bundle);
     return bundle;
   }
 
-  async submitJournalEntry(
-    rawText: string,
-    options?: SubmitJournalOptions,
-  ): Promise<JournalEntryResponse> {
+  /**
+   * Submits a journal entry to the unified backend router.
+   */
+  async submitJournalEntry(rawText: string, options?: SubmitJournalOptions): Promise<JournalEntryResponse> {
     const token = await this.ensureIdToken();
     return this.authedPost<JournalEntryResponse>(`${this.backendUrl}/apiRouter`, token, {
       rawText,
       ...(options?.timestamp != null ? {timestamp: options.timestamp} : {}),
-    });
-  }
-
-  async submitObsidianNote(
-    content: string,
-    options?: SubmitObsidianOptions,
-  ): Promise<WebhookResponse> {
-    const token = await this.ensureIdToken();
-    return this.authedPost<WebhookResponse>(`${this.backendUrl}/obsidianWebhook`, token, {
-      content,
-      ...(options?.duration != null ? {duration: options.duration} : {}),
     });
   }
 
@@ -180,9 +178,7 @@ export class SelfStatsClient {
     const cached = await this.getTokens();
     const now = Math.floor(Date.now() / 1000);
 
-    if (cached && cached.expiresAt - now > 60) {
-      return cached.idToken;
-    }
+    if (cached && cached.expiresAt - now > 60) return cached.idToken;
 
     if (cached?.refreshToken) {
       const refreshed = await this.refreshIdToken(cached.refreshToken);
@@ -194,7 +190,20 @@ export class SelfStatsClient {
   }
 
   private async refreshIdToken(refreshToken: string): Promise<TokenBundle> {
-    const url = `https://securetoken.googleapis.com/v1/token?key=${this.apiKey}`;
+
+    // Check if we are pointing to a local backend'
+    // this is very useful for testing-debugging on local firebase emulator. 
+    const isLocal = this.backendUrl.includes("127.0.0.1") || this.backendUrl.includes("localhost");
+    
+    // Route to the Auth Emulator if local, otherwise use live production servers
+    const baseUrl = isLocal 
+      ? "http://127.0.0.1:9099/identitytoolkit.googleapis.com" 
+      : "https://identitytoolkit.googleapis.com";
+      
+    const url = `${baseUrl}/v1/token?key=${this.apiKey}`;    
+    
+
+
     const res = await this.fetchImpl(url, {
       method: "POST",
       headers: {"Content-Type": "application/x-www-form-urlencoded"},
@@ -206,28 +215,15 @@ export class SelfStatsClient {
       throw new SelfStatsAuthError("Failed to refresh ID token", res.status);
     }
 
-    const data = (await res.json()) as {
-      id_token: string;
-      refresh_token: string;
-      expires_in: string;
-    };
-
+    const data = (await res.json()) as { id_token: string; refresh_token: string; expires_in: string; };
     const expiresAt = Math.floor(Date.now() / 1000) + Number(data.expires_in);
-    return {
-      idToken: data.id_token,
-      refreshToken: data.refresh_token,
-      expiresAt,
-    };
+    return { idToken: data.id_token, refreshToken: data.refresh_token, expiresAt };
   }
 
   private async getTokens(): Promise<TokenBundle | null> {
     const raw = await this.storage.getItem(this.cacheKey);
     if (!raw) return null;
-    try {
-      return JSON.parse(raw) as TokenBundle;
-    } catch {
-      return null;
-    }
+    try { return JSON.parse(raw) as TokenBundle; } catch { return null; }
   }
 
   private async saveTokens(tokens: TokenBundle): Promise<void> {
@@ -237,10 +233,7 @@ export class SelfStatsClient {
   private async authedPost<T>(url: string, idToken: string, body: unknown): Promise<T> {
     const res = await this.fetchImpl(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${idToken}`,
-      },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
       body: JSON.stringify(body),
     });
 
@@ -254,11 +247,7 @@ export class SelfStatsClient {
 }
 
 async function safeJson(res: FetchResponse): Promise<unknown> {
-  try {
-    return await res.json();
-  } catch {
-    return null;
-  }
+  try { return await res.json(); } catch { return null; }
 }
 
 function decodeExpiry(idToken: string): number {
@@ -268,21 +257,15 @@ function decodeExpiry(idToken: string): number {
     const json = base64UrlDecode(payload);
     const decoded = JSON.parse(json);
     if (typeof decoded.exp === "number") return decoded.exp;
-  } catch {
-    // ignore
-  }
+  } catch { /* ignore */ }
   return Math.floor(Date.now() / 1000) + 45 * 60;
 }
 
 function base64UrlDecode(input: string): string {
   const normalized = input.replace(/-/g, "+").replace(/_/g, "/");
   const nodeBuffer = (globalThis as any).Buffer;
-  if (nodeBuffer) {
-    return nodeBuffer.from(normalized, "base64").toString("utf8");
-  }
+  if (nodeBuffer) return nodeBuffer.from(normalized, "base64").toString("utf8");
   const atobGlobal = (globalThis as any).atob as ((data: string) => string) | undefined;
-  if (atobGlobal) {
-    return atobGlobal(normalized);
-  }
-  throw new Error("No base64 decoder available in this environment");
+  if (atobGlobal) return atobGlobal(normalized);
+  throw new Error("No base64 decoder available");
 }
