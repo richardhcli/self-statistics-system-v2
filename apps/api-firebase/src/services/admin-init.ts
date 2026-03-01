@@ -25,6 +25,10 @@ const app: App = getApps().length === 0 ? initializeApp() : getApps()[0];
 /** Pre-configured Firestore instance scoped to the default app. */
 export const db: Firestore = getFirestore(app);
 
+// Tell Firestore to silently strip 'undefined' properties before saving,
+// allowing seamless integration with TypeScript optional properties.
+db.settings({ ignoreUndefinedProperties: true });
+
 /**
  * Re-export `FieldValue` so consumers don't need a separate
  * `firebase-admin/firestore` import for `serverTimestamp()`, `increment()`, etc.

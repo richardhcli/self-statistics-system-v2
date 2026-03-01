@@ -88,10 +88,14 @@ const withTimeout = async <T>(
 };
 
 const getClient = (): GoogleGenAI => {
-  const apiKey = process.env.GOOGLE_API_KEY || process.env.GENAI_API_KEY;
+  console.log("Checking Gemini Key:", process.env.GOOGLE_AI_API_KEY ? "KEY EXISTS" : "KEY MISSING");
+
+  const apiKey = process.env.GOOGLE_AI_API_KEY;
   if (!apiKey) {
     throw new Error("GOOGLE_API_KEY not configured for ai-orchestrator");
   }
+
+  
   return new GoogleGenAI({apiKey});
 };
 
@@ -181,9 +185,9 @@ export const generateTopology = async (
         }),
         120000,
         `ai-orchestrator ${model}`,
-      )) as {response?: {text(): string}};
+      ));
 
-      const raw = result.response?.text();
+      const raw = result.text;
       logger.info(`ai-orchestrator success with model ${model}`, {raw});
 
       const parsed = JSON.parse(raw ?? "{}") as Partial<TopologyResponse>;
