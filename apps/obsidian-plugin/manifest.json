@@ -1,0 +1,10 @@
+{
+	"id": "self-statistics-system",
+	"name": "Self Statistics System",
+	"version": "1.0.0",
+	"minAppVersion": "1.5.0",
+	"description": "Log journal entries, track your EXP, and level up your life directly from Obsidian.",
+	"author": "richardhcli",
+	"authorUrl": "",
+	"isDesktopOnly": false
+}
