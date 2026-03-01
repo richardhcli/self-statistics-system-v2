@@ -24,3 +24,46 @@ Implemented the full Google Auth Integration Pipeline (Phases 1–4) from `.ai/a
 ## Validation
 - `pnpm run lint` (api-firebase): **PASS** (0 errors)
 - `pnpm run typecheck` (web): **PASS** (0 errors)
+
+---
+
+## Session 2: SDK Sandbox Implementation
+
+### Summary
+Implemented Workstream A of `2026-02-28-testing-apiKey.md`. Built the SDK, fixed compile errors, wired up the sandbox runner, and validated the full load path.
+
+### Changes Made
+
+#### SDK (`shared/plugin-sdk`)
+- **Fixed** `src/index.ts` — Added `.js` extensions on re-exports to satisfy `NodeNext` module resolution.
+- **Fixed** `src/client.ts` — Narrowed `fetchImpl` assignment to eliminate `undefined` type error; field is now guaranteed non-null after constructor.
+- **Built** successfully via `pnpm --filter @self-stats/plugin-sdk build` (0 errors; emits `dist/`).
+
+#### Sandbox Runner
+- **Verified** `testing/testing-backend/scripts/sdk-sandbox.ts` loads cleanly via `tsx` — fails at `FIREBASE_API_KEY` guard as expected (no runtime/import errors).
+
+#### Root Config
+- **Added** `tsx` as root devDependency (TS script runner with seamless ESM support; replaces failed `ts-node` runs).
+- **Added** `sdk:sandbox` convenience script to root `package.json` → `tsx testing/testing-backend/scripts/sdk-sandbox.ts`.
+- **Added** `.selfstats-tokens.json` to `.gitignore` (prevents accidental token cache commits).
+
+### Validation
+- `pnpm --filter @self-stats/plugin-sdk build`: **PASS**
+- `pnpm run sdk:sandbox` (dry run, no API key): **Exits cleanly with expected error**
+- `pnpm run typecheck` (web): **PASS**
+- `pnpm run lint` (api-firebase): **PASS**
+
+---
+
+## Session 3: Merge sandbox into emulator test
+
+### Summary
+Aligned the emulator test script with the Custom Token SDK flow by merging the sandbox logic into `testing/testing-backend/testing-emulator/test-obsidian.ts`.
+
+### Changes Made
+- Updated test script to use `SelfStatsClient` (Custom Token exchange + auto-refresh) instead of legacy `x-user-id` polling.
+- Added local file-backed storage cache in the testing-emulator directory to avoid root pollution.
+- Prompt/env-based Setup Code intake; posts via `submitObsidianNote` with Bearer ID token.
+
+### Validation
+- Script loads (requires `FIREBASE_API_KEY`, optional `BACKEND_URL`, prompts or uses `CUSTOM_TOKEN`). Not run against live backend in this session.

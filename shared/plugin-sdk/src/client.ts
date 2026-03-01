@@ -116,9 +116,10 @@ export class SelfStatsClient {
     this.backendUrl = config.backendUrl.replace(/\/+$/, "");
     this.storage = config.storage ?? new MemoryStorage();
     const globalFetch = (globalThis as any).fetch as FetchLike | undefined;
-    this.fetchImpl = config.fetch ?? globalFetch;
+    const resolved = config.fetch ?? globalFetch;
+    if (!resolved) throw new Error("fetch is not available; provide one in config");
+    this.fetchImpl = resolved;
     this.cacheKey = `selfstats:${config.projectId}:tokens`;
-    if (!this.fetchImpl) throw new Error("fetch is not available; provide one in config");
   }
 
   async exchangeCustomToken(customToken: string): Promise<TokenBundle> {

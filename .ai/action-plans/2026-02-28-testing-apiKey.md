@@ -1,7 +1,7 @@
 **Action Plan: SDK Sandbox + Obsidian Setup Code Validation**
 
 **Date:** 2026-02-28  
-**Status:** Ready to execute  
+**Status:** Implemented — SDK builds, sandbox loads, ready for live Setup Code test  
 **Scope:** Validate Custom Token auth end-to-end via the SDK sandbox; outline the Obsidian plugin hookup using the same flow.
 
 ---

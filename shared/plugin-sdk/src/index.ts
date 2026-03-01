@@ -6,5 +6,5 @@
  * Firebase Custom Tokens (Bearer ID tokens) instead of legacy API keys.
  */
 
-export type {StorageAdapter, SelfStatsConfig} from "./client";
-export {SelfStatsClient} from "./client";
+export type {StorageAdapter, SelfStatsConfig} from "./client.js";
+export {SelfStatsClient} from "./client.js";

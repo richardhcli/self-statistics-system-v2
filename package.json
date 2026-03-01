@@ -8,16 +8,16 @@
     "dev:web": "pnpm --filter web run dev",
     "dev:api": "pnpm --filter api-firebase run serve",
     "dev": "concurrently \"pnpm run dev:web\" \"pnpm run dev:api\"",
-
     "build:web": "pnpm --filter web run build",
     "build:api": "pnpm --filter api-firebase run build",
     "build": "concurrently \"pnpm run build:web\" \"pnpm run build:api\"",
-    
-    "deploy": "pnpm run build && firebase deploy"
+    "deploy": "pnpm run build && firebase deploy",
+    "sdk:sandbox": "tsx testing/testing-backend/scripts/sdk-sandbox.ts"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "tsx": "^4.21.0"
   }
 }
