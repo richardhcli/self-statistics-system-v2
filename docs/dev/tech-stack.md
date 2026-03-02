@@ -7,7 +7,7 @@ The Neural Second Brain is built on a modern, high-performance stack designed fo
 ## Core Frameworks
 - **React 19** (`^19.2.3`): Leverages the latest concurrent rendering features and `useTransition` for smooth UI updates during heavy AI processing.
 - **TypeScript** (`~5.8.2`): Strict mode for comprehensive type safety.
-- **Vite 6** (`^6.2.0`): Fast build tooling with HMR. Custom path aliases: `@web/` → `src/`, `@systems/` → `src/systems/`.
+- **Vite 6** (`^6.2.0`): Fast build tooling with HMR. Custom path aliases: `@web/` → `apps/web/src/`, `@self-stats/*` → workspace packages.
 - **Tailwind CSS 4** (`^4.1.18`): Utility-first styling for a high-contrast, professional-grade interface with native Dark Mode support.
 
 ## State Management
@@ -39,6 +39,6 @@ The Neural Second Brain is built on a modern, high-performance stack designed fo
 - **Bulletproof React**: A scalable architecture emphasizing feature-based modularity.
 - **Hybrid Read-Aside, Sync-Behind**: Firebase is the source of truth, while Zustand + IndexedDB provide cache-first reads with optimistic writes.
 - **Semantic Layering**: A hierarchical approach to data modeling that maps granular human tasks to abstract cognitive traits.
-- **Systems Architecture**: Pure domain logic (game math, progression rules) isolated in `src/systems/` — no React, no stores, no side-effects.
+- **Shared Packages Architecture**: Pure domain logic (game math, progression rules, graph transforms) extracted into isomorphic `shared/*` workspace packages (`@self-stats/*`) — consumed identically by frontend, backend, and plugins.
 - **Separated Selector Facade Pattern**: All global stores expose state via fine-grained selector hooks and a single stable actions object.
-- **Orchestrator Pattern**: Cross-store business logic coordinated via custom hooks in `src/hooks/`.
+- **Orchestrator Pattern**: Cross-store business logic coordinated via custom hooks in `apps/web/src/hooks/`.

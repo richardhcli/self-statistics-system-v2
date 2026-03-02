@@ -1,33 +1,103 @@
 # Jumpstart Guide: Running the Application
 
-Follow these steps to get the application running locally for development and testing.
+**Last Updated**: March 2, 2026
+
+Follow these steps to get the monorepo running locally for development and testing.
+
+## Prerequisites
+- **Node.js 20** (LTS)
+- **pnpm** (enable via `corepack enable pnpm` in an elevated terminal)
+- **Java** (required for Firebase Firestore emulator)
+- **Firebase CLI** (`npm install -g firebase-tools`)
 
 ## 1. Install Dependencies
 
-First, you need to install the necessary Node.js packages defined in `package.json`. Open your terminal in the project's root directory and run:
+From the **monorepo root** directory:
 
 ```bash
-npm install
+pnpm install
 ```
 
-This command will download and install all the required libraries, including Vite, which is used to build and serve the application.
+This links all workspace packages (`shared/*`, `apps/*`) and installs dependencies via pnpm's strict symlink structure.
 
-## 2. Start the Development Server
+## 2. Environment Configuration
 
-Once the dependencies are installed, you can start the local development server. Run the following command:
+Create a `.env` file in `apps/api-firebase/` with your Google AI API key:
+
+```
+GOOGLE_AI_API_KEY=your-key-here
+```
+
+For production deployment, secrets are managed via Google Cloud Secret Manager (see [esbuild-backend-bundler.md](build/esbuild-backend-bundler.md)).
+
+## 3. Start the Development Stack
+
+Boot both the Vite frontend and Firebase emulators simultaneously:
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
-This will start the Vite development server. You will see output in your terminal indicating that the server is running, along with the local URL where you can access the application.
+This runs `concurrently`:
+- **Web app**: `pnpm --filter web run dev` → Vite dev server at [http://localhost:5173](http://localhost:5173)
+- **API**: `pnpm --filter api-firebase run serve` → esbuild watch + Firebase emulators
 
-## 3. View the Application
+## 4. Individual Workspace Commands
 
-Open your web browser and navigate to the address shown in your terminal. It will typically be:
+```bash
+# Web app only
+pnpm --filter web run dev
 
-[http://localhost:3000](http://localhost:3000)
+# Backend only (build + emulators)
+pnpm --filter api-firebase run serve
 
-You should now see the self-statistics-system application running in your browser.
+# Run typechecks
+pnpm --filter web run typecheck
+
+# Run backend lint
+pnpm --filter api-firebase run lint
+
+# Build all
+pnpm run build
+
+# Deploy (build + sync secrets + firebase deploy)
+pnpm run deploy
+```
+
+## 5. Obsidian Plugin Development
+
+```bash
+# Development build (watch mode)
+pnpm --filter obsidian-self-stats-plugin run dev
+
+# Production build
+pnpm --filter obsidian-self-stats-plugin run build
+```
+
+Copy the built `main.js` and `manifest.json` into your Obsidian vault's `.obsidian/plugins/self-stats/` directory.
+
+## 6. Workspace Structure
+
+```
+self-statistics-system-v2/          # Monorepo root
+├── apps/
+│   ├── web/                        # React frontend (Vite)
+│   ├── api-firebase/               # Firebase Cloud Functions backend
+│   └── obsidian-plugin/            # Obsidian integration plugin
+├── shared/
+│   ├── contracts/                  # @self-stats/contracts — pure TS interfaces
+│   ├── progression-system/         # @self-stats/progression-system — EXP math
+│   ├── soul-topology/              # @self-stats/soul-topology — graph transforms
+│   └── plugin-sdk/                 # @self-stats/plugin-sdk — universal API client
+├── testing/                        # Backend test scripts & emulator harnesses
+├── pnpm-workspace.yaml             # Workspace definition
+├── tsconfig.base.json              # Shared TS config with @self-stats/* aliases
+└── package.json                    # Root scripts (dev, build, deploy)
+```
+
+## Related Docs
+- [Workspace management](workspace/pnpm-workspace-guidelines.md)
+- [Backend bundling](build/esbuild-backend-bundler.md)
+- [Dev vs Prod environments](build/dev-vs-prod.md)
 
 

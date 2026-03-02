@@ -4,7 +4,7 @@
 
 ## Google Gemini AI Pipeline
 
-The application utilizes `gemini-3-flash-preview` (primary) with `gemini-2.0-flash` (fallback) for high-speed, structured semantic analysis. To ensure the highest level of consistency and reproducibility (essential for a stable "Neural Brain"), the system is strictly hardcoded to a **Cognitive Temperature of 0.0** (defined in `@systems/progression/constants`).
+The application utilizes `gemini-3-flash-preview` (primary) with `gemini-2.0-flash` (fallback) for high-speed, structured semantic analysis. To ensure the highest level of consistency and reproducibility (essential for a stable "Neural Brain"), the system is strictly hardcoded to a **Cognitive Temperature of 0.0** (defined in `@self-stats/progression-system/constants`).
 
 ### The 3-Layer Semantic Extraction
 When a user provides input (voice or text), the system executes a chained classification process:
@@ -22,7 +22,7 @@ The system defines seven gravity-well attributes that the AI is encouraged to cl
 - **Creativity** — Innovation, design, and artistry
 - **Leadership** — Vision, influence, and direction
 
-Defined in [src/systems/progression/constants.ts](../src/systems/progression/constants.ts) as `CORE_ATTRIBUTES`.
+Defined in [shared/progression-system/src/constants.ts](../../shared/progression-system/src/constants.ts) as `CORE_ATTRIBUTES`.
 
 ### Deep Abstraction & Generalization
 If the classification pipeline detects a **new Characteristic** that doesn't yet exist in the `cdagTopology`, it triggers the **Generalization Engine**:
@@ -30,11 +30,11 @@ If the classification pipeline detects a **new Characteristic** that doesn't yet
 - **The Progression Root**: The engine is instructed to stop generation once it reaches the ultimate concept: **"progression"**.
 - **Proportionality**: Each link in the chain (Child -> Parent) includes a weight representing the proportion of the parent concept comprised by the child.
 
-Implementation: Prompt templates in [src/lib/google-ai/config/prompts.ts](../src/lib/google-ai/config/prompts.ts). Orchestration and topology updates in [src/lib/soulTopology/](../src/lib/soulTopology/index.ts).
+Implementation: Prompt templates in [apps/web/src/lib/google-ai/config/prompts.ts](../../apps/web/src/lib/google-ai/config/prompts.ts). Orchestration and topology transforms in [shared/soul-topology/](../../shared/soul-topology/src/index.ts).
 
 ## Gamification: The Progression System
 
-All game logic is centralized in [src/systems/progression/](../src/systems/progression/index.ts) — a pure, side-effect-free module with no React or store dependencies.
+All game logic is centralized in [shared/progression-system/](../../shared/progression-system/src/index.ts) (`@self-stats/progression-system`) — a pure, side-effect-free module with no React or store dependencies.
 
 ### Experience Propagation (Path-Weighted Cumulative Averaging)
 1. **Injection**: EXP is injected into "Action" nodes based on the entry's duration (30 mins = 1.0 EXP base unit, configurable via `MINUTES_PER_EXP_UNIT`).
@@ -42,7 +42,7 @@ All game logic is centralized in [src/systems/progression/](../src/systems/progr
 3. **Path Normalization**: If a node is reached by multiple paths, the intensity is averaged across all paths rather than summed.
 4. **The Progression Anchor**: All paths eventually terminate at the **"progression"** root node, providing a global metric of lifetime advancement.
 
-Engine: [src/systems/progression/engine.ts](../src/systems/progression/engine.ts) — `calculateParentPropagation(nodes, edges, initialValues)`.
+Engine: [shared/progression-system/src/engine.ts](../../shared/progression-system/src/engine.ts) — `calculateParentPropagation(nodes, edges, initialValues)`.
 
 ### Logarithmic Level Curve
 - **Formula**: `Level = floor(log2(EXP + 1))`
@@ -50,13 +50,13 @@ Engine: [src/systems/progression/engine.ts](../src/systems/progression/engine.ts
 - **Thresholds**: `getExpForLevel(level)` returns the EXP needed to reach a given level (`2^level - 1`).
 - **Precision**: All EXP values rounded to 4 decimal places (`EXP_PRECISION`).
 
-Formulas: [src/systems/progression/formulas.ts](../src/systems/progression/formulas.ts).
+Formulas: [shared/progression-system/src/formulas.ts](../../shared/progression-system/src/formulas.ts).
 
 ### State Mutations
 - **Level-up detection**: `updatePlayerStatsState(currentStats, expIncreases)` returns `{ nextStats, totalIncrease, levelsGained }`.
 - **Types**: `NodeStats { experience: number; level: number }`, `PlayerStatistics = Record<string, NodeStats>`.
 
-Mutations: [src/systems/progression/state-mutations.ts](../src/systems/progression/state-mutations.ts).
+Mutations: [shared/progression-system/src/state-mutations.ts](../../shared/progression-system/src/state-mutations.ts).
 
 ### Status System (UI)
 - **Radar Chart**: 7-axis visualization of core attribute levels using Recharts.
@@ -65,4 +65,4 @@ Mutations: [src/systems/progression/state-mutations.ts](../src/systems/progressi
 - **Global Level Badge**: Computed from total accumulated XP via the logarithmic curve.
 - **Deterministic Growth**: Because the temperature is locked at 0.0, identical journal inputs will result in identical neural impact, making the player level a reliable reflection of effort.
 
-UI: [src/features/statistics/components/](../src/features/statistics/components/statistics-view.tsx).
+UI: [apps/web/src/features/statistics/components/](../src/features/statistics/components/statistics-view.tsx).

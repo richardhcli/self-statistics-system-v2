@@ -15,14 +15,14 @@ Authentication is handled via Firebase Authentication with Google and Anonymous 
 ## Architecture
 
 ### Auth State Management
-- **Provider**: [src/providers/auth-provider.tsx](../../src/providers/auth-provider.tsx)
+- **Provider**: [apps/web/src/providers/auth-provider.tsx](../../apps/web/src/providers/auth-provider.tsx)
 - **Access Hook**: `useAuth()` returns `{ user, loading, hasTimedOut, logout }`
 - **Observer**: `onAuthStateChanged(auth, ...)` tracks authentication state
 - **Logout**: Centralized `logout()` function ensures consistent sign-out behavior
 
 ### Intended Causal Flow
-1. User visits `/auth/login` and sees [AuthView](../../src/features/auth/components/auth-view.tsx).
-2. User clicks "Sign in with Google" or "Continue as Guest" in [LoginForm](../../src/features/auth/components/log-in-form.tsx).
+1. User visits `/auth/login` and sees [AuthView](../../apps/web/src/features/auth/components/auth-view.tsx).
+2. User clicks "Sign in with Google" or "Continue as Guest" in [LoginForm](../../apps/web/src/features/auth/components/log-in-form.tsx).
 3. `loginWithGoogle()` or `loginAsGuest()` runs the Firebase auth flow and returns a Firebase `User`.
 4. `syncUserProfile(user)` writes `users/{uid}` and seeds `account_config/*` (first login only).
 5. `AuthProvider` listens to `onAuthStateChanged(auth, ...)` and publishes `{ user, loading, hasTimedOut }`.
@@ -31,12 +31,12 @@ Authentication is handled via Firebase Authentication with Google and Anonymous 
 
 ### Route Protection
 - **Protected routes**: All `/app/*` paths
-- **Gatekeeper**: [ProtectedRoute](../../src/routes/protected-route.tsx) component
+- **Gatekeeper**: [ProtectedRoute](../../apps/web/src/routes/protected-route.tsx) component
 - **Redirect**: Unauthenticated users sent to `/auth/login`
 
 ### Debugging
 - **Auth diagnostics tab**: `/app/debug/authentication`
-- **UI component**: [AuthenticationView](../../src/features/debug/components/authentication-view.tsx)
+- **UI component**: [AuthenticationView](../../apps/web/src/features/debug/components/authentication-view.tsx)
 - Displays private session state (UID, provider data, metadata) for troubleshooting.
 
 ---
@@ -44,7 +44,7 @@ Authentication is handled via Firebase Authentication with Google and Anonymous 
 ## Components
 
 ### AuthView
-**Location**: [src/features/auth/components/auth-view.tsx](../../src/features/auth/components/auth-view.tsx)
+**Location**: [apps/web/src/features/auth/components/auth-view.tsx](../../apps/web/src/features/auth/components/auth-view.tsx)
 
 Full-screen login interface with:
 - Application title and description
@@ -54,7 +54,7 @@ Full-screen login interface with:
 - Timeout fallback (shows troubleshooting tips and reload button)
 
 ### LoginForm
-**Location**: [src/features/auth/components/log-in-form.tsx](../../src/features/auth/components/log-in-form.tsx)
+**Location**: [apps/web/src/features/auth/components/log-in-form.tsx](../../apps/web/src/features/auth/components/log-in-form.tsx)
 
 Google sign-in and guest entry with:
 - Loading state during authentication
@@ -63,7 +63,7 @@ Google sign-in and guest entry with:
 - Guest sign-in for anonymous sessions
 
 ### GuestBanner
-**Location**: [src/components/notifications/guest-banner.tsx](../../src/components/notifications/guest-banner.tsx)
+**Location**: [apps/web/src/components/notifications/guest-banner.tsx](../../apps/web/src/components/notifications/guest-banner.tsx)
 
 Inline banner shown for guest users:
 - Explains guest data is tied to the current device
@@ -80,7 +80,7 @@ Inline banner shown for guest users:
 **Notes**:
 - Created automatically on first login (including anonymous sessions)
 - Existing documents are never overwritten; only changed fields are updated
-- Implementation: [src/lib/firebase/user-profile.ts](../../src/lib/firebase/user-profile.ts)
+- Implementation: [apps/web/src/lib/firebase/user-profile.ts](../../apps/web/src/lib/firebase/user-profile.ts)
 
 ### Subcollection: `users/{uid}/account_config`
 
@@ -92,7 +92,7 @@ Inline banner shown for guest users:
 
 **Notes**:
 - Seeded automatically on first login
-- Implementation: [src/lib/firebase/user-profile.ts](../../src/lib/firebase/user-profile.ts)
+- Implementation: [apps/web/src/lib/firebase/user-profile.ts](../../apps/web/src/lib/firebase/user-profile.ts)
 
 ---
 
@@ -109,12 +109,12 @@ Inline banner shown for guest users:
 ### Logout
 **Route**: `/auth/logout`
 
-**Location**: [src/features/auth/components/logout-view.tsx](../../src/features/auth/components/logout-view.tsx)
+**Location**: [apps/web/src/features/auth/components/logout-view.tsx](../../apps/web/src/features/auth/components/logout-view.tsx)
 
 Dedicated sign-out screen using centralized `logout()` helper from AuthProvider for consistent error handling.
 
 ### Firebase Config
-**Location**: [src/lib/firebase/services.ts](../../src/lib/firebase/services.ts)
+**Location**: [apps/web/src/lib/firebase/services.ts](../../apps/web/src/lib/firebase/services.ts)
 
 Exports:
 - `auth` — Firebase Auth instance
@@ -130,4 +130,4 @@ Exports:
 - **Session persistence**: Firebase SDK handles token refresh automatically
 - **Error handling**: Authentication errors display inline on login form
 - **Local-first**: Auth state persists across page refreshes via Firebase SDK
-- **Guest recovery**: When linking fails with `auth/credential-already-in-use`, guest Firestore data and local IndexedDB caches are cleared before signing into the existing account. See [src/features/auth/utils/link-account.ts](../../src/features/auth/utils/link-account.ts) and [src/stores/root/reset-local-state.ts](../../src/stores/root/reset-local-state.ts).
+- **Guest recovery**: When linking fails with `auth/credential-already-in-use`, guest Firestore data and local IndexedDB caches are cleared before signing into the existing account. See [apps/web/src/features/auth/utils/link-account.ts](../../apps/web/src/features/auth/utils/link-account.ts) and [apps/web/src/stores/root/reset-local-state.ts](../../apps/web/src/stores/root/reset-local-state.ts).

@@ -1,45 +1,79 @@
 # Firebase Functions Runbook
 
-**Last Updated**: February 16, 2026
+**Last Updated**: March 2, 2026
 
-**Purpose**: Operational reference for Cloud Functions, emulators, and plugin pipelines.
+**Purpose**: Operational reference for Cloud Functions, the 3-layer backend architecture, and local development.
 **Audience**: Developers modifying backend integrations or running the local stack.
 **Related Documents**:
-	- [plugins-style-guide.md](./plugins-style-guide.md) — rules for building new plugins
-	- [functions/src/index.ts](functions/src/index.ts) — exported functions registry
-	- [docs/changelog.md](docs/changelog.md) — release notes
+	- [plugins-style-guide.md](./plugins-style-guide.md) — rules for building new integrations
+	- [apps/api-firebase/src/index.ts](../../../../apps/api-firebase/src/index.ts) — exported functions registry
+	- [../../CHANGELOG.md](../../../../CHANGELOG.md) — release notes
 
 ---
 
-## Function Inventory
-- **obsidianApi**: HTTPS ingest endpoint that stores journal content and enqueues `jobs` via `PluginSDK`. See [functions/src/plugins/obsidian-integration/api.ts](functions/src/plugins/obsidian-integration/api.ts).
-- **obsidianWorker**: Firestore trigger on `users/{uid}/jobs/{jobId}` that marks jobs processing, calls AI gateway, tags the source journal entry, and updates XP. See [functions/src/plugins/obsidian-integration/worker.ts](functions/src/plugins/obsidian-integration/worker.ts).
-- **aiGateway**: Single-prompt topology generator (Gemini) that powers journal/Obsidian analysis. Requires `GOOGLE_API_KEY` env when running outside the mock. See [functions/src/microservices/ai-gateway.ts](functions/src/microservices/ai-gateway.ts).
-- **journalPipeline**: Synchronous journal ingest → AI analysis → graph and XP updates in a single HTTPS call. See [functions/src/plugins/journal-pipeline/api.ts](functions/src/plugins/journal-pipeline/api.ts).
+## Architecture: 3-Layer Monolith
+
+The backend follows a **data-access → services → endpoints** layered architecture inside `apps/api-firebase/src/`.
+
+### Data-Access Layer
+Pure Firestore CRUD operations, user-scoped:
+- `data-access/graph-repo.ts` — Graph nodes, edges, manifests.
+- `data-access/user-repo.ts` — User profile, player statistics.
+- `data-access/journal-repo.ts` — Journal entries and metadata.
+
+### Services Layer
+Business logic orchestration:
+- `services/ai-orchestrator.ts` — Gemini AI provider (`nodeAiProvider` adapter), topology generation.
+- `services/journal-service.ts` — Unified pipeline: AI extraction → topology transform (via `@self-stats/soul-topology`) → progression calc (via `@self-stats/progression-system`) → Firestore persistence. Returns `JournalResult` with `statChanges`.
+- `services/graph-service.ts` — Thin facade wrapping graph data-access repos.
+
+### Endpoints Layer
+- `endpoints/callable/journal.ts` — `onCall` + Firebase Auth. Used by the web app.
+- `endpoints/callable/integration-auth.ts` — `generateFirebaseAccessToken`. Mints 1-hour Custom Tokens via `getAuth().createCustomToken(uid)`.
+- `endpoints/rest/api-router.ts` — REST endpoint with Bearer token auth. Used by external integrations.
+- `endpoints/rest/obsidian-webhook.ts` — Obsidian-specific webhook endpoint.
+- `endpoints/rest/middleware.ts` — `authenticateRequest` — Bearer token + `verifyIdToken()` validation.
+
+## Function Exports
+All exports are defined in `apps/api-firebase/src/index.ts`:
+- `processJournalEntry` (callable) — Web app journal ingestion.
+- `generateFirebaseAccessToken` (callable) — Custom Token minting.
+- `apiRouter` (onRequest) — REST API for external integrations.
+- `obsidianWebhook` (onRequest) — Obsidian-specific REST endpoint.
 
 ## Local Development
-- Prereqs: Node.js, Java (for Firestore emulator), Firebase CLI.
-- Install/build (from `/functions`):
+- **Prereqs**: Node.js 20, Java (for Firestore emulator), Firebase CLI, pnpm.
+- **Build & Serve** (from monorepo root):
 	```bash
-	npm install
-	npm run build --silent
+	pnpm --filter api-firebase run serve
 	```
-- Run emulators from repo root to ensure Firestore + Functions share ports defined in `firebase.json`:
+	This runs esbuild in watch mode + Firebase emulators (`functions` + `firestore`).
+- **Full stack** (web + backend):
 	```bash
-	firebase emulators:start --only functions,firestore
+	pnpm run dev
 	```
-- HTTPS ingest base when emulators are running: `http://127.0.0.1:5001/self-statistics-system-v2/us-central1/obsidianApi`.
+- **Build only**:
+	```bash
+	pnpm --filter api-firebase run build
+	```
+	Uses `build.mjs` (esbuild) to produce `dist/index.js` with an Isolated Dist `package.json`.
 
-## Data Contracts (via PluginSDK)
-- Journals: `users/{uid}/journal_entries/{entryId}` with `content`, `metadata`, `createdAt` (`Timestamp.now()`), `createdAtIso`.
-- Jobs: `users/{uid}/jobs/{jobId}` with `type`, `payload`, `status ∈ {queued, processing, completed, failed}`, `result`, `errors`, timestamps.
-- Player stats: `users/{uid}/user_information/player_statistics` with transactional XP updates.
+## Secret Management
+- Secrets bound via `defineSecret("GOOGLE_AI_API_KEY")` for Gen 2 Cloud Run functions.
+- `sync-secrets.mjs` pushes local `.env` values to Google Cloud Secret Manager before deployment.
+- **Deploy**: `pnpm --filter api-firebase run deploy` (build + sync-secrets + firebase deploy --only functions).
 
-## Error Handling and Logging
-- Wrap HTTPS handlers with `try/catch` and return JSON `{error}`; log the raw error for emulator debugging (avoids silent 500s).
-- Use `Timestamp` from `firebase-admin/firestore` instead of `FieldValue.serverTimestamp()` to keep emulator and production parity.
-- All Firestore paths must be user-namespaced; avoid admin-wide reads.
+## Data Contracts
+- Journals: `users/{uid}/journal_entries/{entryId}`
+- Player stats: `users/{uid}/user_information/player_statistics`
+- Graphs: `users/{uid}/graphs/cdag_topology` with subcollections `nodes`, `edges`, `graph_metadata`
+
+## Error Handling
+- Wrap HTTPS handlers with `try/catch` and return JSON `{error}`.
+- Use `Timestamp` from `firebase-admin/firestore` for emulator parity.
+- All Firestore paths are user-namespaced.
+- `ignoreUndefinedProperties: true` in Firestore init to prevent `undefined` value crashes.
 
 ## Testing
-- End-to-end emulator (job queue): run [testing/testing-backend/testing-emulator/test-obsidian.py](testing/testing-backend/testing-emulator/test-obsidian.py) after starting the emulators. The script submits content, polls for job completion, and asserts AI tagging/XP updates.
-- TypeScript harness: run [testing/testing-backend/testing-emulator/test-obsidian.ts](testing/testing-backend/testing-emulator/test-obsidian.ts) for the same workflow using native fetch.
+- Emulator test: `testing/testing-backend/testing-emulator/test-obsidian.ts` (uses `SelfStatsClient` with Custom Token exchange).
+- SDK sandbox: `pnpm run sdk:sandbox` (dry-run validation of `@self-stats/plugin-sdk`).

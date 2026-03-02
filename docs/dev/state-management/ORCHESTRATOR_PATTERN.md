@@ -9,7 +9,7 @@
 ## Overview
 Orchestrators coordinate multi-store updates in a single business operation. They implement the **Cross-Store Coordination Pattern** described in the Global State Protocol.
 
-**Pure Logic**: Complex calculations should live in `/lib` or `/systems` (e.g., `@systems/progression`), not in the orchestrator itself. Orchestrators call these pure functions and dispatch results to stores.
+**Pure Logic**: Complex calculations should live in `/lib` or shared packages (e.g., `@self-stats/progression-system`), not in the orchestrator itself. Orchestrators call these pure functions and dispatch results to stores.
 
 ## Pattern Structure
 
@@ -135,4 +135,4 @@ setGraph({
 
 - [Global State Protocol](./GLOBAL_STATE.md) - Core patterns
 - [State Management README](./state-management-README.md) - Architecture overview
-- Graph Store Types: [src/stores/cdag-topology/types.ts](../../src/stores/cdag-topology/types.ts)
+- Graph Store Types: [apps/web/src/stores/cdag-topology/types.ts](../../apps/web/src/stores/cdag-topology/types.ts)

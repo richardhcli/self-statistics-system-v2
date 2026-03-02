@@ -61,7 +61,7 @@ interface StoreState {
 - Separated Selector Facade Pattern: Separated state/action hooks for optimal re-renders
 - Each store uses `persist` middleware with IndexedDB backend
 
-### 2. **Persist Middleware** (`src/stores/root/persist-middleware.ts`)
+### 2. **Persist Middleware** (`apps/web/src/stores/root/persist-middleware.ts`)
 - Wraps all stores with automatic persistence
 - Uses `idb-keyval` for async, non-blocking IndexedDB operations
 - Handles version management for schema migrations
@@ -367,7 +367,7 @@ See [ROADMAP.md](./ROADMAP.md) for planned non-destructive migration system.
 
 ## Sync Protocol (Implemented: Firebase Read-Aside)
 
-Firebase sync is implemented via service-layer functions in `src/lib/firebase/`. Each domain (journal, graph, player-statistics, user-profile) has its own service file that handles reads and writes to Firestore.
+Firebase sync is implemented via service-layer functions in `apps/web/src/lib/firebase/`. Each domain (journal, graph, player-statistics, user-profile) has its own service file that handles reads and writes to Firestore.
 
 ```typescript
 // Pattern: Service-layer sync (already implemented)

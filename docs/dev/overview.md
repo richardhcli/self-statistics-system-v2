@@ -10,8 +10,9 @@ This is an technical overview for app developers.
 - **Connectivity**: PWA-ready with Service Worker and Manifest support.
 
 ## Custom Technologies
-- **Progression System**: Centralized in `src/systems/progression/` — propagation engine, EXP scaling, logarithmic level curve, and 7 core attribute definitions. Aliased as `@systems/progression`.
-- **Topology Logic**: Graph merging, classification, and topology utilities in `src/lib/soulTopology/`.
+- **Progression System**: Isomorphic package `shared/progression-system/` (`@self-stats/progression-system`) — propagation engine, EXP scaling, logarithmic level curve, and 7 core attribute definitions.
+- **Topology Logic**: Graph transforms, classification, and merge operations in `shared/soul-topology/` (`@self-stats/soul-topology`).
+- **Plugin SDK**: Universal API client in `shared/plugin-sdk/` (`@self-stats/plugin-sdk`) — auto-refresh auth, zero Firebase dependency.
 
 
 ## 🚀 Core Philosophy & Mechanics

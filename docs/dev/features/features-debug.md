@@ -5,7 +5,7 @@ The Debug Console provides low-level access to the application's engine and pers
 ## Routing
 - Base route: `/app/debug`
 - Sub-routes: `/app/debug/console`, `/app/debug/graph`, `/app/debug/manual-journal-entry`, `/app/debug/datastores`, `/app/debug/authentication`
-- Layout: [src/features/debug/components/debug-view.tsx](../../src/features/debug/components/debug-view.tsx) renders the tab bar and an `Outlet` for nested panels.
+- Layout: [apps/web/src/features/debug/components/debug-view.tsx](../../apps/web/src/features/debug/components/debug-view.tsx) renders the tab bar and an `Outlet` for nested panels.
 
 ## Architecture Compliance
 
@@ -40,7 +40,7 @@ const data = useStore.getState().data;  // ✅
 ## Components
 
 ### 1. PersistenceView
-**File:** `src/features/debug/components/persistence-view.tsx`
+**File:** `apps/web/src/features/debug/components/persistence-view.tsx`
 
 Displays serialized JSON of all application stores.
 
@@ -50,7 +50,7 @@ Displays serialized JSON of all application stores.
 - Never uses non-existent getter methods
 
 ### 2. TopologyManager
-**File:** `src/features/debug/components/topology-manager.tsx`
+**File:** `apps/web/src/features/debug/components/topology-manager.tsx`
 
 Interactive graph node management.
 
@@ -66,7 +66,7 @@ const { addNode, removeNode } = useGraphActions();  // Write actions
 ```
 
 ### 3. DebuggingManualJournalEntryForm
-**File:** `src/features/debug/components/debugging-manual-journal-entry-form.tsx`
+**File:** `apps/web/src/features/debug/components/debugging-manual-journal-entry-form.tsx`
 
 Debug-only manual journal entry form for testing AI and manual action pipelines.
 
@@ -79,7 +79,7 @@ Debug-only manual journal entry form for testing AI and manual action pipelines.
 - Accessible via Debug Console → Manual Journal Entry tab
 
 ### 4. TestInjections
-**File:** `src/features/debug/api/test-injections.ts`
+**File:** `apps/web/src/features/debug/api/test-injections.ts`
 
 Batch data injection utilities for testing.
 
@@ -89,7 +89,7 @@ Batch data injection utilities for testing.
 - `injectSamplePlayerStats()` - Injects XP values
 
 ### 5. AuthenticationView
-**File:** `src/features/debug/components/authentication-view.tsx`
+**File:** `apps/web/src/features/debug/components/authentication-view.tsx`
 
 Displays private authentication diagnostics for the active session.
 
@@ -104,12 +104,12 @@ Displays private authentication diagnostics for the active session.
 - [architecture-lib-vs-stores.md](../architecture/architecture-lib-vs-stores.md) — Where logic lives (`/lib`, `/stores`, `/systems`)
 
 ### 6. DatastoresView
-**File:** [src/features/debug/components/datastores-view.tsx](../../src/features/debug/components/datastores-view.tsx)
+**File:** [apps/web/src/features/debug/components/datastores-view.tsx](../../apps/web/src/features/debug/components/datastores-view.tsx)
 
 Split debug view for local and backend datastore tooling. Includes:
-- Console feed: [src/features/debug/components/datastores-console.tsx](../../src/features/debug/components/datastores-console.tsx)
-- Local datastore panel: [src/features/debug/components/local-datastore-view.tsx](../../src/features/debug/components/local-datastore-view.tsx)
-- Backend datastore panel: [src/features/debug/components/database-view.tsx](../../src/features/debug/components/database-view.tsx)
+- Console feed: [apps/web/src/features/debug/components/datastores-console.tsx](../../apps/web/src/features/debug/components/datastores-console.tsx)
+- Local datastore panel: [apps/web/src/features/debug/components/local-datastore-view.tsx](../../apps/web/src/features/debug/components/local-datastore-view.tsx)
+- Backend datastore panel: [apps/web/src/features/debug/components/database-view.tsx](../../apps/web/src/features/debug/components/database-view.tsx)
 
 ## Tools
 - **Batch Data Injection**:

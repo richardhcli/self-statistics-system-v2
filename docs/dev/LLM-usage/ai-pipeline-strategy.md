@@ -26,13 +26,13 @@ Instead of making multiple API calls, we use one highly optimized "Stuffed Promp
 5.  **Generalization**: (Optional) builds a vertical abstraction chain up to the "progression" root node.
 
 **Key Implementation File:**
-See `SINGLE_PROMPT_TOPOLOGY_PROMPT` in [src/lib/google-ai/config/stuffed-prompt.ts](../../src/lib/google-ai/config/stuffed-prompt.ts).
+See `SINGLE_PROMPT_TOPOLOGY_PROMPT` in [apps/web/src/lib/google-ai/config/stuffed-prompt.ts](../../apps/web/src/lib/google-ai/config/stuffed-prompt.ts).
 
 ### Analysis Execution Logic
 The execution logic resides in `text-to-topology.ts`. It handles the model fallback loop and sets aggressive timeouts (45s per attempt) to ensure the UI remains responsive even if the primary model hangs.
 
 **Key Implementation File:**
-See `processTextToLocalTopologySinglePrompt` in [src/lib/google-ai/utils/single-prompt/text-to-topology.ts](../../src/lib/google-ai/utils/single-prompt/text-to-topology.ts).
+See `processTextToLocalTopologySinglePrompt` in [apps/web/src/lib/google-ai/utils/single-prompt/text-to-topology.ts](../../apps/web/src/lib/google-ai/utils/single-prompt/text-to-topology.ts).
 
 ## 3. Voice Transcription Pipeline
 
@@ -45,7 +45,7 @@ The system uses a dedicated pipeline for processing WebM audio blobs directly fr
 4.  **Output**: Returns raw text for subsequent semantic analysis.
 
 **Key Implementation File:**
-See `transcribeWebmAudio` in [src/lib/google-ai/utils/transcribe-webm-audio.ts](../../src/lib/google-ai/utils/transcribe-webm-audio.ts).
+See `transcribeWebmAudio` in [apps/web/src/lib/google-ai/utils/transcribe-webm-audio.ts](../../apps/web/src/lib/google-ai/utils/transcribe-webm-audio.ts).
 
 ## 4. Prompt Injection Safety
 

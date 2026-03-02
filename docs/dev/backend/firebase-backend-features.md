@@ -1,24 +1,41 @@
 # Firebase Backend Features and Operations
 
-**Last Updated**: February 10, 2026
+**Last Updated**: March 2, 2026
 
-## Read-Aside Services
-- User profile and settings: [src/lib/firebase/user-profile.ts](../../src/lib/firebase/user-profile.ts)
-- Player statistics: [src/lib/firebase/player-statistics.ts](../../src/lib/firebase/player-statistics.ts)
-- Journal read-aside: [src/lib/firebase/journal.ts](../../src/lib/firebase/journal.ts)
-- Graph read-aside (CDAG): [src/lib/firebase/graph-service.ts](../../src/lib/firebase/graph-service.ts)
-- CRUD helpers for debug tools: [src/lib/firebase/firestore-crud.ts](../../src/lib/firebase/firestore-crud.ts)
+## Backend Architecture (`apps/api-firebase/src/`)
+
+### Data-Access Layer
+- Graph CRUD: [apps/api-firebase/src/data-access/graph-repo.ts](../../../apps/api-firebase/src/data-access/graph-repo.ts)
+- User CRUD: [apps/api-firebase/src/data-access/user-repo.ts](../../../apps/api-firebase/src/data-access/user-repo.ts)
+- Journal CRUD: [apps/api-firebase/src/data-access/journal-repo.ts](../../../apps/api-firebase/src/data-access/journal-repo.ts)
+
+### Services Layer
+- AI orchestrator: [apps/api-firebase/src/services/ai-orchestrator.ts](../../../apps/api-firebase/src/services/ai-orchestrator.ts)
+- Journal pipeline: [apps/api-firebase/src/services/journal-service.ts](../../../apps/api-firebase/src/services/journal-service.ts)
+- Graph service: [apps/api-firebase/src/services/graph-service.ts](../../../apps/api-firebase/src/services/graph-service.ts)
+
+### Endpoints Layer
+- Journal callable: [apps/api-firebase/src/endpoints/callable/journal.ts](../../../apps/api-firebase/src/endpoints/callable/journal.ts)
+- Integration auth: [apps/api-firebase/src/endpoints/callable/integration-auth.ts](../../../apps/api-firebase/src/endpoints/callable/integration-auth.ts)
+- REST API router: [apps/api-firebase/src/endpoints/rest/api-router.ts](../../../apps/api-firebase/src/endpoints/rest/api-router.ts)
+- Obsidian webhook: [apps/api-firebase/src/endpoints/rest/obsidian-webhook.ts](../../../apps/api-firebase/src/endpoints/rest/obsidian-webhook.ts)
+
+## Web App Read-Aside Services (`apps/web/src/`)
+- User profile and settings: [apps/web/src/lib/firebase/user-profile.ts](../../../apps/web/src/lib/firebase/user-profile.ts)
+- Player statistics: [apps/web/src/lib/firebase/player-statistics.ts](../../../apps/web/src/lib/firebase/player-statistics.ts)
+- Journal read-aside: [apps/web/src/lib/firebase/journal.ts](../../../apps/web/src/lib/firebase/journal.ts)
+- Graph read-aside: [apps/web/src/lib/firebase/graph-service.ts](../../../apps/web/src/lib/firebase/graph-service.ts)
 
 ## Settings UI Mapping
-- Profile display name: users/{uid}
-- Status display class: users/{uid}/user_information/profile_display
-- UI preferences: users/{uid}/account_config/ui_preferences
-- AI settings: users/{uid}/account_config/ai_settings
-- Privacy settings: users/{uid}/account_config/privacy
-- Notification settings: users/{uid}/account_config/notifications
+- Profile display name: `users/{uid}`
+- Status display class: `users/{uid}/user_information/profile_display`
+- UI preferences: `users/{uid}/account_config/ui_preferences`
+- AI settings: `users/{uid}/account_config/ai_settings`
+- Privacy settings: `users/{uid}/account_config/privacy`
+- Notification settings: `users/{uid}/account_config/notifications`
 
 ## Default Seed Values
-Defined in [src/lib/firebase/user-profile.ts](../../src/lib/firebase/user-profile.ts).
+Defined in [apps/web/src/lib/firebase/user-profile.ts](../../../apps/web/src/lib/firebase/user-profile.ts).
 - ai_settings: provider gemini, voice model gemini-2-flash, abstraction model gemini-3-flash, temperature 0, maxTokens 2048, apiKey empty
 - ui_preferences: theme dark, language en, visibility toggles true
 - privacy: encryptionEnabled true, visibilityMode private, biometricUnlock false
@@ -28,16 +45,11 @@ Defined in [src/lib/firebase/user-profile.ts](../../src/lib/firebase/user-profil
 - profile_display: class empty
 - player_statistics: progression seeded
 
+## Security Rules
+Firestore rules allow authenticated users to read/write their own subtree only.
+- Rules: [firestore.rules](../../../firestore.rules)
+
 ## Debug Datastores View
 The debug datastores view can fetch backend snapshots, hydrate stores, and remove documents or fields.
-- Feature doc: [docs/docs-features/features-datastores-debug.md](../docs-features/features-datastores-debug.md)
-- Force sync UI: [src/features/debug/components/force-sync-panel.tsx](../../src/features/debug/components/force-sync-panel.tsx)
-- Snapshot mapping: [src/features/debug/utils/datastore-sync.ts](../../src/features/debug/utils/datastore-sync.ts)
-
-## Security Rules
-Firestore rules currently allow authenticated users to read/write their own subtree.
-- Rules live in the Firebase project config (see firebase.json).
-
-## Common Errors
-- Missing or insufficient permissions: review Firestore rules and auth state.
-- Invalid document reference: ensure document paths use even segment counts (for example, users/{uid}/graphs/cdag_topology).
+- Feature doc: [../features/features-datastores-debug.md](../features/features-datastores-debug.md)
+- Force sync UI: [apps/web/src/features/debug/components/force-sync-panel.tsx](../../../apps/web/src/features/debug/components/force-sync-panel.tsx)

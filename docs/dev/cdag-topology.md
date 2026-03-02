@@ -2,14 +2,14 @@
 # cdagTopology: The Neural Source of Truth
 
 The `cdagTopology` is the logical structural backbone of the application.
-All topology utilities (merge, checks, propagation) are implemented in `lib/soulTopology`.
+All topology utilities (merge, checks, propagation) are implemented in `@self-stats/soul-topology` (`shared/soul-topology/`).
 
 ## 🧠 Core Architecture
 
 The topology is a **Weighted Directed Acyclic Graph (DAG)** stored with a **Hybrid Read-Aside** pattern.
 Firebase is the source of truth; Zustand + IndexedDB cache data for fast reads.
 
-Firebase access lives in [src/lib/firebase/graph-service.ts](../src/lib/firebase/graph-service.ts). The cache schema is defined in [src/stores/cdag-topology/types.ts](../src/stores/cdag-topology/types.ts).
+Firebase access lives in [apps/web/src/lib/firebase/graph-service.ts](../../apps/web/src/lib/firebase/graph-service.ts). The cache schema is defined in [apps/web/src/stores/cdag-topology/types.ts](../../apps/web/src/stores/cdag-topology/types.ts).
 
 ## 📚 Firestore Collections
 - **graph_metadata/topology_manifest**: Lightweight topology manifest (node summaries + weighted adjacency).
@@ -17,7 +17,7 @@ Firebase access lives in [src/lib/firebase/graph-service.ts](../src/lib/firebase
 - **edges**: Full edge documents.
 
 ### Data Structure
-See the authoritative types in [src/stores/cdag-topology/types.ts](../src/stores/cdag-topology/types.ts).
+See the authoritative types in [apps/web/src/stores/cdag-topology/types.ts](../src/stores/cdag-topology/types.ts).
 
 ## 🏷 Classification Logic
 - **Actions** (`NodeType = 'action'`): Real-world activities. They are the sources of EXP.
@@ -35,7 +35,7 @@ Edge weights are adjusted via the `mergeTopology` logic using a global `LEARNING
 
 ## 📈 Integration
 - **Graph Layout**: Uses structure adjacency for fast layout, then enriches with node/edge details on demand.
-- **EXP Engine**: The `src/systems/progression/` module uses the weighted hierarchy for back-propagation. `calculateParentPropagation()` walks edges upward to accumulate attribute EXP. See [ai-and-gamification.md](./ai-and-gamification.md) for formulas.
+- **EXP Engine**: The `@self-stats/progression-system` package uses the weighted hierarchy for back-propagation. `calculateParentPropagation()` walks edges upward to accumulate attribute EXP. See [ai-and-gamification.md](./ai-and-gamification.md) for formulas.
 - **7 Core Attributes**: The AI prompt guides top-level characteristics toward Vitality, Intellect, Wisdom, Social, Discipline, Creativity, Leadership — but allows organic concepts when they don't cleanly fit.
 
 ## 🔄 Read-Aside Flow

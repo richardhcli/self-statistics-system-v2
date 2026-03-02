@@ -8,12 +8,12 @@
 - A tree index (year/month/day) drives rendering and lazy month fetches.
 
 ## Architecture Map
-- **Entry data + tree + cache**: [src/stores/journal/types.ts](../../../src/stores/journal/types.ts)
-- **ID generation and parsing**: [src/features/journal/utils/id-generator.ts](../../../src/features/journal/utils/id-generator.ts)
-- **Firebase journal service**: [src/lib/firebase/journal.ts](../../../src/lib/firebase/journal.ts)
-- **Zustand store + cache rules**: [src/stores/journal/store.ts](../../../src/stores/journal/store.ts)
-- **Unified pipeline**: [src/features/journal/hooks/use-journal-entry-pipeline.ts](../../../src/features/journal/hooks/use-journal-entry-pipeline.ts)
-- **Entry orchestration glue**: [src/hooks/use-entry-orchestrator.ts](../../../src/hooks/use-entry-orchestrator.ts)
+- **Entry data + tree + cache**: [apps/web/src/stores/journal/types.ts](../../../apps/web/src/stores/journal/types.ts)
+- **ID generation and parsing**: [apps/web/src/features/journal/utils/id-generator.ts](../../../apps/web/src/features/journal/utils/id-generator.ts)
+- **Firebase journal service**: [apps/web/src/lib/firebase/journal.ts](../../../apps/web/src/lib/firebase/journal.ts)
+- **Zustand store + cache rules**: [apps/web/src/stores/journal/store.ts](../../../apps/web/src/stores/journal/store.ts)
+- **Unified pipeline**: [apps/web/src/features/journal/hooks/use-journal-entry-pipeline.ts](../../../apps/web/src/features/journal/hooks/use-journal-entry-pipeline.ts)
+- **Entry orchestration glue**: [apps/web/src/hooks/use-entry-orchestrator.ts](../../../apps/web/src/hooks/use-entry-orchestrator.ts)
 
 ## User Flows
 - **Voice auto-submit**: audio capture → transcription → analysis
@@ -22,11 +22,11 @@
 - **Quick log**: submit → draft only
 
 ## UI Surface
-- **Feature container**: [src/features/journal/components/journal-feature.tsx](../../../src/features/journal/components/journal-feature.tsx)
-- **Journal view**: [src/features/journal/components/journal-view.tsx](../../../src/features/journal/components/journal-view.tsx)
-- **Entry item**: [src/features/journal/components/journal-entry-item/journal-entry-item.tsx](../../../src/features/journal/components/journal-entry-item/journal-entry-item.tsx)
-- **Manual entry form**: [src/features/journal/components/manual-entry-form.tsx](../../../src/features/journal/components/manual-entry-form.tsx)
-- **Voice recorder**: [src/features/journal/components/voice-recorder/voice-recorder.tsx](../../../src/features/journal/components/voice-recorder/voice-recorder.tsx)
+- **Feature container**: [apps/web/src/features/journal/components/journal-feature.tsx](../../../apps/web/src/features/journal/components/journal-feature.tsx)
+- **Journal view**: [apps/web/src/features/journal/components/journal-view.tsx](../../../apps/web/src/features/journal/components/journal-view.tsx)
+- **Entry item**: [apps/web/src/features/journal/components/journal-entry-item/journal-entry-item.tsx](../../../apps/web/src/features/journal/components/journal-entry-item/journal-entry-item.tsx)
+- **Manual entry form**: [apps/web/src/features/journal/components/manual-entry-form.tsx](../../../apps/web/src/features/journal/components/manual-entry-form.tsx)
+- **Voice recorder**: [apps/web/src/features/journal/components/voice-recorder/voice-recorder.tsx](../../../apps/web/src/features/journal/components/voice-recorder/voice-recorder.tsx)
 
 ## Processing States
 - Draft and analysis status updates are driven by the unified pipeline.

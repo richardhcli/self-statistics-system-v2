@@ -1,16 +1,37 @@
 # Obsidian Integration
 
-Sync your neural journal entries directly into your local Obsidian vault as Markdown files.
+**Last Updated**: March 2, 2026
 
-## Prerequisites
-Requires the **[Obsidian Local REST API](https://coddingtonbear.github.io/obsidian-local-rest-api/)** plugin.
-1. Enable the plugin in Obsidian.
-2. Configure the **API Key** and **Port** in the app settings at `/app/settings/integrations`.
-3. Configuration is stored in Firestore at `users/{uid}/account_config/integrations/obsidianConfig` and cached locally in the `user-integrations` Zustand store.
+The Self-Statistics System provides a dedicated **Obsidian plugin** (`apps/obsidian-plugin/`) that syncs journal entries from your Obsidian vault to the backend for AI analysis and EXP progression.
 
-## Format
-Entries are saved with rich YAML frontmatter, including the extracted domain, activity, and weighted action breakdown.
+## Architecture
+- **Plugin**: `apps/obsidian-plugin/` — built with `esbuild`, consumes `@self-stats/plugin-sdk`.
+- **SDK**: `shared/plugin-sdk/` (`@self-stats/plugin-sdk`) — universal `SelfStatsClient` with automatic Firebase ID token refresh.
+- **Backend**: `apps/api-firebase/src/endpoints/rest/obsidian-webhook.ts` — REST endpoint with Bearer token auth.
 
-## Sync Logic
-- **Trigger**: Automatic upon entry classification.
-- **Upsert**: Updates existing files if the date-based filename matches, ensuring your vault stays current.
+## Setup
+1. In the **web app** Integration tab, generate a **Connection Code** (1-hour Custom Token).
+2. In Obsidian, open the **Self Stats plugin settings** and paste the Connection Code.
+3. The plugin SDK exchanges the code for a permanent Refresh Token stored in Obsidian's `data.json`.
+4. All subsequent requests use auto-refreshed ID tokens — no re-authentication needed.
+
+## How It Works
+1. User writes a journal note in Obsidian.
+2. Plugin sends the note text via `SelfStatsClient.submitObsidianNote()`.
+3. Backend runs the AI → topology → progression pipeline.
+4. Plugin receives `JournalEntryResponse` with `statChanges` (per-stat EXP deltas).
+5. Plugin appends a rich collapsible **Obsidian callout** to the note:
+   ```
+   > [!info] Self Statistics
+   > EXP UP!! **{Stat}**: {Old} → {New} (+{Inc}) (+{Total} total EXP)
+   > > [!success]- All increases:
+   > > - {Stat}: {Old} → {New} (+{Inc})
+   > {Original Journal Text}
+   ```
+
+## Authentication Flow
+See [authentication/api-authentication-pipeline.md](../authentication/api-authentication-pipeline.md) for the full Custom Token lifecycle.
+
+## Related Docs
+- [Backend functions runbook](../backend/functions/firebase-functions.md)
+- [Plugin style guide](../backend/functions/plugins-style-guide.md)

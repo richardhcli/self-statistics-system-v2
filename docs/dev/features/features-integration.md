@@ -1,27 +1,36 @@
 
 # Feature: Integrations
 
-The Integrations module enables the "Neural Second Brain" to communicate with external web services and local productivity tools. It serves as the primary bridge between local-first cognitive data and the wider digital ecosystem.
+**Last Updated**: March 2, 2026
 
-## 🛠 Supported Engines
+The Integrations module enables external plugins and services to communicate with the Self-Statistics System backend.
 
-### 1. Outbound Webhooks
-Send real-time JSON payloads to any HTTP endpoint. Perfect for Zapier, Make.com, or custom automation servers.
-- **Trigger**: Automatic broadcast whenever an AI-processed entry is finalized.
+## Supported Engines
+
+### 1. Obsidian Plugin
+A dedicated native Obsidian plugin (`apps/obsidian-plugin/`) built on `@self-stats/plugin-sdk`.
+- **Connection**: Setup Code generated in the web app Integration tab → exchanged for permanent Refresh Token.
+- **Authentication**: Firebase Custom Tokens with automatic ID token refresh.
+- **Output**: Rich collapsible markdown callouts with per-stat EXP deltas.
+- See [integrations/obsidian.md](../integrations/obsidian.md) for architecture details.
+
+### 2. Connection Code (Web App UI)
+The `ConnectionCode` component (`apps/web/src/features/integration/components/connection-code.tsx`) generates setup codes for external plugins:
+- Calls `generateFirebaseAccessToken` callable to mint a 1-hour Custom Token.
+- Displays with copy-to-clipboard and amber warning UI.
+- Auto-clears after display.
+
+### 3. Outbound Webhooks
+Real-time JSON payloads sent to any HTTP endpoint upon AI-processed entry finalization.
+- **Trigger**: Automatic broadcast when an entry is classified.
 - **Payload**: Contains original text, extracted duration, and the full 3-layer semantic analysis.
-- **Diagnostics**: The integrated "Transmission Log" provides a detailed feed of all success/error states and raw data streams.
 
-### 2. Obsidian Local REST API
-A specialized integration for the Obsidian note-taking community. It bypasses the cloud entirely to write Markdown notes directly to your local computer via a secure REST bridge.
-- **Configuration**: Requires the "Local REST API" plugin active in Obsidian with an authorized API key.
-- **Output**: Generates Markdown files with rich YAML frontmatter, ensuring your life-log is searchable and formatted for long-term archival.
+### 4. Data Portability (Backup & Restore)
+Your data is yours. The Data Portability panel manages IndexedDB state:
+- **Export**: Download entire application state (Journal, Graph, Stats) as a `.json` file.
+- **Import**: Restore from any valid backup file (destructive: replaces current local state).
 
-### 3. Data Portability (Backup & Restore)
-Your neural data is yours. The Data Portability panel allows you to manage your IndexedDB state manually.
-- **Export**: Download your entire application state (Journal, Graph, Stats) as a single, portable `.json` file.
-- **Import**: Restore any valid neural-brain-backup file. Note that this is a destructive operation that replaces the current local state with the backup content.
-
-## 💾 Security & Persistence
-- **Firestore-Backed**: Integration secrets (API Keys, Webhook URLs) are stored in Firestore at `users/{uid}/account_config/integrations` and cached locally in the `user-integrations` Zustand store + IndexedDB.
+## Security & Persistence
+- **Custom Token Auth**: External plugins authenticate via Firebase Custom Tokens (not API keys).
+- **Firestore-Backed**: Integration configuration stored at `users/{uid}/account_config/integrations`.
 - **Read-Aside Pattern**: Settings load from IndexedDB on boot, then sync from Firestore if stale.
-- **Log Management**: Transmission logs are kept locally to help debug integrations. They can be purged at any time via the "Clear History" button.

@@ -33,9 +33,9 @@ The CDAG load path follows a strict sequence for fast render and accurate data:
 4. **Detail Expansion**: The graph fetches the full node/edge collections once per app load, then only re-fetches when the data is stale (30-minute TTL).
 
 Implementation references:
-- Sync hook: [src/hooks/use-cdag-structure.ts](../../src/hooks/use-cdag-structure.ts)
-- Store cache logic: [src/stores/cdag-topology/store.ts](../../src/stores/cdag-topology/store.ts)
-- Firebase service: [src/lib/firebase/graph-service.ts](../../src/lib/firebase/graph-service.ts)
+- Sync hook: [apps/web/src/hooks/use-cdag-structure.ts](../../apps/web/src/hooks/use-cdag-structure.ts)
+- Store cache logic: [apps/web/src/stores/cdag-topology/store.ts](../../apps/web/src/stores/cdag-topology/store.ts)
+- Firebase service: [apps/web/src/lib/firebase/graph-service.ts](../../apps/web/src/lib/firebase/graph-service.ts)
 
 ## Highlighting System
 - **Primary Selection**: Selected nodes receive an **Indigo Glow Aura** and bold stroke.

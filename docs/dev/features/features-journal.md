@@ -7,10 +7,10 @@
 - A tree index (year/month/day) drives fast navigation and lazy entry loading.
 
 ## Core Files (Start Here)
-- Feature container: [src/features/journal/components/journal-feature.tsx](../../src/features/journal/components/journal-feature.tsx)
-- Unified pipeline: [src/features/journal/hooks/use-journal-entry-pipeline.ts](../../src/features/journal/hooks/use-journal-entry-pipeline.ts)
-- Store + cache: [src/stores/journal/store.ts](../../src/stores/journal/store.ts)
-- Firebase service: [src/lib/firebase/journal.ts](../../src/lib/firebase/journal.ts)
+- Feature container: [apps/web/src/features/journal/components/journal-feature.tsx](../../apps/web/src/features/journal/components/journal-feature.tsx)
+- Unified pipeline: [apps/web/src/features/journal/hooks/use-journal-entry-pipeline.ts](../../apps/web/src/features/journal/hooks/use-journal-entry-pipeline.ts)
+- Store + cache: [apps/web/src/stores/journal/store.ts](../../apps/web/src/stores/journal/store.ts)
+- Firebase service: [apps/web/src/lib/firebase/journal.ts](../../apps/web/src/lib/firebase/journal.ts)
 
 ## Key Constraints
 - Entry IDs must remain sortable for month-range queries.

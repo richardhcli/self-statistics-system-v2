@@ -1,11 +1,12 @@
-# Architecture Protocol: /lib vs /stores vs /systems
+# Architecture Protocol: /lib vs /stores vs shared packages
 
-**Purpose**: Defines strict separation between pure logic, state management, and domain systems  
+**Purpose**: Defines strict separation between pure logic, state management, and shared domain packages  
 **Audience**: Developers implementing features or refactoring code  
-**Related**: [ai-guidelines.md](../ai-guidelines.md#5-the-engine-vs-state-split-lib-vs-stores), [architecture.md](./architecture.md)
+**Last Updated**: March 2, 2026  
+**Related**: [architecture.md](./architecture.md)
 
 ## Overview
-This document defines the strict separation between **Pure Logic** (`/lib`), **Global State** (`/stores`), and **Domain Systems** (`/systems`). This distinction is critical for maintaining a **Hybrid Read-Aside** system that is testable, reference-stable, and free of circular dependencies.
+This document defines the strict separation between **Pure Logic** (`/lib`), **Global State** (`/stores`), and **Shared Domain Packages** (`shared/*`). This distinction is critical for maintaining a **Hybrid Read-Aside** system that is testable, reference-stable, and free of circular dependencies.
 
 ## 1. The /lib Directory (The "Soul")
 The `/lib` folder contains the domain's "Soul"—the pure math, algorithms, and data models.
@@ -62,24 +63,29 @@ When a utility needs data from multiple stores, it must be coordinated by an **O
 
 
 
-## 5. The /systems Directory (Domain Logic Modules)
-The `/systems` folder contains **pure, side-effect-free domain logic** that is too complex or cohesive for `/lib` utilities. Systems are independent modules with their own `index.ts` barrel exports, aliased as `@systems/*` in tsconfig.json and vite.config.ts.
+## 5. Shared Domain Packages (`shared/*`)
+Shared packages contain **pure, side-effect-free domain logic** that is consumed identically by all apps in the monorepo. Each package is an independent workspace with its own `package.json`, `tsconfig.json`, and barrel `index.ts`. Packages are referenced via `@self-stats/*` workspace protocol.
 
 ### Core Responsibilities
 * **Domain Engine Logic**: Complex multi-step calculations that form a cohesive module (e.g., progression system).
 * **Constants & Metadata**: Domain constants, enums, and descriptive metadata relevant to the system.
 * **State Mutation Functions**: Pure functions that take state + input → return new state. They never call stores directly.
+* **Shared Contracts**: TypeScript interfaces consumed by frontend, backend, and plugins.
 
 ### Implementation Rules
-* ❌ **NO** imports from `@web/stores` or React hooks.
+* ❌ **NO** imports from `@web/stores`, React hooks, or Firebase SDKs.
 * ❌ **NO** side effects — all functions are pure.
-* ✅ **DO** export via barrel `index.ts`.
-* ✅ **DO** import in stores, hooks, and components as `@systems/[module]`.
+* ✅ **DO** export via barrel `src/index.ts`.
+* ✅ **DO** import in all apps as `@self-stats/[package]`.
+* ✅ **DO** use `workspace:*` protocol in dependent `package.json` files.
 
-### Current Systems
-* `src/systems/progression/` — EXP engine, level curve, attribute constants, state mutations, orchestrator logic.
+### Current Shared Packages
+* `shared/contracts/` (`@self-stats/contracts`) — Pure TypeScript interfaces: CDAG types, AI contracts, Firestore schemas.
+* `shared/progression-system/` (`@self-stats/progression-system`) — EXP engine, level curve, attribute constants, state mutations, orchestrator logic.
+* `shared/soul-topology/` (`@self-stats/soul-topology`) — Graph transforms, merge operations, entry-pipeline utilities.
+* `shared/plugin-sdk/` (`@self-stats/plugin-sdk`) — Universal API client with auto-refresh auth, zero Firebase dependency.
 
 
 
 ## Summary for AI Prompt
-"When creating new logic, define the core data models and pure algorithms in `/lib`. For cohesive domain modules (like the progression system), use `/systems`. Implement the **Separated Selector Facade Pattern** in `/stores`, importing the `/lib` and `/systems` types and utilities to handle state updates. Ensure the store uses `partialize` to exclude actions from IndexedDB persistence."
+"When creating new logic, define the core data models and pure algorithms in `/lib` (app-specific) or `shared/*` (cross-app). For cohesive domain modules (like the progression system), use a shared workspace package under `shared/`. Implement the **Separated Selector Facade Pattern** in `/stores`, importing `@self-stats/*` packages and `/lib` utilities to handle state updates. Ensure the store uses `partialize` to exclude actions from IndexedDB persistence."

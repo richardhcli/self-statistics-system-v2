@@ -17,15 +17,15 @@ Firebase provides authentication and cloud persistence for user profile, setting
 | root | `root-store` | Serialization + app metadata |
 
 ## Progression System
-The `@systems/progression` module (`src/systems/progression/`) contains all EXP/level logic as pure functions. It is imported by stores and hooks but never accesses stores directly. See [ai-and-gamification.md](../ai-and-gamification.md) for formulas and attributes.
+The `@self-stats/progression-system` package (`shared/progression-system/`) contains all EXP/level logic as pure functions. It is imported by stores, hooks, and the backend but never accesses stores directly. See [ai-and-gamification.md](../ai-and-gamification.md) for formulas and attributes.
 
 ## Current architecture: 
 
 ### Stack
 - **Auth**: Firebase Auth (Google + Anonymous providers)
 - **Database**: Firestore
-- **Config**: [src/lib/firebase/services.ts](../../src/lib/firebase/services.ts)
-- **Progression Engine**: [src/systems/progression/](../../src/systems/progression/) (`@systems/progression` alias)
+- **Config**: [apps/web/src/lib/firebase/services.ts](../../apps/web/src/lib/firebase/services.ts)
+- **Progression Engine**: [shared/progression-system/](../../../shared/progression-system/) (`@self-stats/progression-system`)
 
 ### Firestore Schema (Current)
 
@@ -118,7 +118,7 @@ graphs (collection)
 
 ### Routing Context
 Routes are URL-based under `/app`. Settings lives under `/app/settings/*`.
-See [src/app/routes.tsx](../../src/app/routes.tsx).
+See [apps/web/src/app/routes.tsx](../../apps/web/src/app/routes.tsx).
 
 ## Configs: 
 
@@ -138,16 +138,16 @@ service cloud.firestore {
 ```
 
 ## Auth Flow (Current)
-- UI: [src/features/auth/components/auth-view.tsx](../../src/features/auth/components/auth-view.tsx)
-- Provider: [src/providers/auth-provider.tsx](../../src/providers/auth-provider.tsx)
-- Login: [src/features/auth/utils/login-google.ts](../../src/features/auth/utils/login-google.ts)
+- UI: [apps/web/src/features/auth/components/auth-view.tsx](../../apps/web/src/features/auth/components/auth-view.tsx)
+- Provider: [apps/web/src/providers/auth-provider.tsx](../../apps/web/src/providers/auth-provider.tsx)
+- Login: [apps/web/src/features/auth/utils/login-google.ts](../../apps/web/src/features/auth/utils/login-google.ts)
 - On login: `syncUserProfile` seeds Firestore on first login and smart-syncs profile fields.
 
 ## Usage
 
 
 ### Firestore Helpers (Use These)
-All in [src/lib/firebase/user-profile.ts](../../src/lib/firebase/user-profile.ts)
+All in [apps/web/src/lib/firebase/user-profile.ts](../../apps/web/src/lib/firebase/user-profile.ts)
 - `syncUserProfile` (first login + smart sync)
 - `loadUserProfile`, `updateUserProfile`
 - `loadAccountConfig`, `updateAccountConfig`
@@ -157,11 +157,11 @@ All in [src/lib/firebase/user-profile.ts](../../src/lib/firebase/user-profile.ts
 - `loadNotificationSettings`, `updateNotificationSettings`
 - `loadProfileDisplay`, `updateProfileDisplay`
 - `loadIntegrationSettings`, `updateIntegrationSettings`
-- Player statistics: [src/lib/firebase/player-statistics.ts](../../src/lib/firebase/player-statistics.ts)
+- Player statistics: [apps/web/src/lib/firebase/player-statistics.ts](../../apps/web/src/lib/firebase/player-statistics.ts)
 
 ### Routing Context
 Routes are URL-based under /app. Settings lives under /app/settings/*.
-See [src/app/routes.tsx](../../src/app/routes.tsx).
+See [apps/web/src/app/routes.tsx](../../apps/web/src/app/routes.tsx).
 
 ## Configs
 
@@ -181,7 +181,7 @@ service cloud.firestore {
 
 
 ### Default Seed Values (First Login)
-Defined in [src/lib/firebase/user-profile.ts](../../src/lib/firebase/user-profile.ts)
+Defined in [apps/web/src/lib/firebase/user-profile.ts](../../apps/web/src/lib/firebase/user-profile.ts)
 - ai_settings: provider gemini, voice model gemini-2-flash, abstraction model gemini-3-flash, temperature 0, maxTokens 2048, apiKey empty
 - ui_preferences: theme dark, language en, visibility toggles true
 - privacy: encryptionEnabled true, visibilityMode private, biometricUnlock false
