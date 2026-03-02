@@ -37,9 +37,11 @@
         ".git",
         "firebase-debug.log",
         "firebase-debug.*.log",
-        "*.local"
+        "*.local",
+        "src"
       ],
-      "source": "apps/api-firebase"
+      "source": "apps/api-firebase/dist",
+      "predeploy": "pnpm run build"
     }
   ],
   "emulators": {

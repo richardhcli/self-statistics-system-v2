@@ -35,7 +35,6 @@ export {generateFirebaseAccessToken} from "./endpoints/callable/integration-auth
 
 // REST (external plugin endpoints)
 export {apiRouter} from "./endpoints/rest/api-router";
-export {obsidianWebhook} from "./endpoints/rest/obsidian-webhook";
 
 // Testing (dev only)
 export {debugEndpoint, helloWorld} from "./testing";
