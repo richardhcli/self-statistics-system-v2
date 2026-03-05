@@ -4,21 +4,28 @@ The Self-Statistics System supports external integrations to extend journaling b
 
 ## Obsidian Plugin
 
-An official Obsidian plugin allows you to submit journal entries directly from your vault.
+A dedicated Obsidian plugin (`apps/obsidian-plugin/`) lets you submit journal entries directly from your vault.
 
 ### Setup
 
-1. Install the plugin from the Obsidian community plugins directory.
-2. In the web app, go to **Settings → Integrations** and generate a Setup Code.
-3. Paste the Setup Code into the Obsidian plugin settings.
-4. The plugin exchanges the code for a persistent refresh token — no repeated sign-in required.
+1. In the **web app Integrations tab**, generate a **Connection Code** (a 1-hour Custom Token).
+2. In Obsidian, open the **Self Stats plugin settings** and paste the Connection Code.
+3. The plugin exchanges the code for a permanent refresh token stored locally — no re-authentication needed.
 
 ### Usage
 
 - Write a journal entry in Obsidian as a normal note.
-- Use the plugin command to submit the note to the Self-Statistics backend.
-- AI analysis, XP, and graph updates happen exactly as they would from the web app.
+- Use the plugin command to submit the note to the backend.
+- The backend runs the full AI → topology → progression pipeline.
+- The plugin appends a rich collapsible callout to your note showing per-stat EXP deltas (e.g., "Intellect: 2.5 → 3.1 (+0.6)").
 
-## Future Integrations
+## Outbound Webhooks
 
-Additional integration points (API, webhooks) are planned. Check the integrations tab for the latest available connections.
+Real-time JSON payloads are sent to any configured HTTP endpoint when an entry finishes AI processing. The payload contains the original text, extracted duration, and the full 3-layer semantic analysis.
+
+## Data Portability (Backup & Restore)
+
+- **Export** — Download your entire application state (journal, graph, stats) as a `.json` file.
+- **Import** — Restore from any valid backup file. This is destructive and replaces current local state.
+
+Managed from the web app Integrations tab.

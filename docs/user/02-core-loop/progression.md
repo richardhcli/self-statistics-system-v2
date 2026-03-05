@@ -1,28 +1,36 @@
 # Progression System
 
-The progression system gamifies your growth by turning journal activity into measurable stats through a feed-forward pipeline.
+The progression system gamifies your growth by turning journal activity into measurable stats through a path-weighted propagation pipeline.
 
 ## Pipeline
 
-1. **Entry → Actions + Time** — AI analysis extracts what you did and how long it took.
-2. **Actions → XP** — Time converts into experience points (e.g., 30 min ≈ 1 XP).
-3. **Feed-forward through CDAG** — XP propagates up the Characteristic DAG from actions → skills → characteristics, updating every relevant node.
-4. **Results** — Total XP changes are returned to you and stored.
-
-This is inspired by feed-forward and back-propagation algorithms in neural networks.
+1. **Entry → Actions + Time** — AI analysis extracts the actions you performed and how long each took.
+2. **Actions → XP** — Duration converts into experience points (30 min = 1.0 XP base unit).
+3. **Upward propagation through CDAG** — XP flows from action nodes upward through skills to characteristics. Each edge weight determines the proportion of XP that propagates. If a node is reached by multiple paths, the intensity is averaged across paths rather than summed.
+4. **Progression root** — All paths eventually terminate at a single "progression" root node, providing a global metric of lifetime advancement.
+5. **Results** — Per-node XP changes are returned to you and stored.
 
 ## XP & Levels
 
-- XP accumulates per node in the CDAG and maps to levels.
-- Levels provide a rough approximation of experience in each area.
-- The system rewards sustained practice, not one-off bursts.
+- **Level formula**: Level = floor(log₂(XP + 1)). Each level requires exponentially more XP.
+- XP accumulates per node in the CDAG (actions, skills, characteristics).
+- A **global level** is computed from your total accumulated XP across all nodes.
+- All XP values are rounded to 4 decimal places for precision.
 
-## Streaks
+## The 7 Core Attributes
 
-- Consecutive daily entries build a streak counter.
-- Streaks provide bonus XP and are visible on the statistics dashboard.
-- Missing a day resets the streak but does not penalise existing XP.
+The system defines seven top-level characteristics that the AI classifies toward:
+
+- **Vitality** — Physical resilience, fitness, and health
+- **Intellect** — Analytical capacity and technical rigor
+- **Wisdom** — Metacognition, judgement, and depth
+- **Social** — Charisma, collaboration, and empathy
+- **Discipline** — Focus, self-control, and habits
+- **Creativity** — Innovation, design, and artistry
+- **Leadership** — Vision, influence, and direction
+
+Organic characteristics that don't fit these seven are preserved as-is.
 
 ## Philosophy
 
-The system avoids punitive mechanics. Progress is always forward — you cannot lose levels or have stats decreased. The goal is a "status screen" for real life: visibility into momentum, not anxiety about metrics.
+The system avoids punitive mechanics. Progress is always forward — you cannot lose levels or have stats decreased. Because the AI runs at temperature 0.0, identical inputs produce identical results, making your level a reliable reflection of effort.
