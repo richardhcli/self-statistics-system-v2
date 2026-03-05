@@ -10,6 +10,8 @@
 
 Authentication is handled via Firebase Authentication with Google and Anonymous providers. User profile data is stored in Firestore with automatic initialization on first login, including guest sessions.
 
+Public landing pages at `/`, `/about`, and `/usage` remain outside the auth gate and render without waiting for persistence hydration. They link into `/auth/login` or directly into `/app/*` when a session already exists.
+
 ---
 
 ## Architecture
@@ -32,6 +34,7 @@ Authentication is handled via Firebase Authentication with Google and Anonymous 
 ### Route Protection
 - **Protected routes**: All `/app/*` paths
 - **Gatekeeper**: [ProtectedRoute](../../apps/web/src/routes/protected-route.tsx) component
+- **Public routes**: `/`, `/about`, `/usage`, `/auth/login`, `/auth/logout`
 - **Redirect**: Unauthenticated users sent to `/auth/login`
 
 ### Debugging

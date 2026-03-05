@@ -2,7 +2,7 @@
 
 **Date**: March 4, 2026  
 **Purpose**: Add public-facing landing, about, and usage pages accessible before login  
-**Status**: Awaiting confirmation
+**Status**: Implemented (public routes live)
 
 ---
 
@@ -142,4 +142,11 @@ Changes:
 
 One consideration: The App component currently blocks rendering until IndexedDB persistence initializes (usePersistence()). Public pages don't need stores, so we may want to fast-path past that wait on public routes. This is an optional optimization.
 Create a plan-of-action to only block rendering upon the actual web app view, not the public pages. 
+
+---
+
+## Completion Notes (2026-03-04)
+- Public layout and landing/about/usage pages shipped under `/`, `/about`, `/usage`.
+- Route catch-all now returns to `/` instead of `/app`.
+- Persistence gate only applies to `/app/*` protected routes to keep public pages instant.
 

@@ -4,6 +4,8 @@ import { AuthView } from "../features/auth";
 import { LogoutView } from "../features/auth/components/logout-view";
 import { ProtectedRoute } from "../routes";
 import { MainLayout } from "../components/layout/main-layout";
+import { PublicLayout } from "../components/layout/public-layout";
+import { AboutPage, LandingPage, UsagePage } from "../features/landing";
 
 // Feature routes
 import { SettingsRoutes } from "../features/settings/routes";
@@ -21,7 +23,7 @@ import { BillingView } from "../features/billing";
  * Application routing configuration.
  * 
  * URL-based routing with nested routes:
- * - Public routes: /auth/login
+ * - Public routes: /, /about, /usage, /auth/login
  * - Protected routes: /app/* (require authentication)
  * 
  * Feature routing structure:
@@ -32,9 +34,17 @@ import { BillingView } from "../features/billing";
 export const AppRoutes = () => {
   const routes = useRoutes([
     // Public routes
+    {
+      path: "/",
+      element: <PublicLayout />,
+      children: [
+        { index: true, element: <LandingPage /> },
+        { path: "about", element: <AboutPage /> },
+        { path: "usage", element: <UsagePage /> },
+      ],
+    },
     { path: "/auth/login", element: <AuthView /> },
     { path: "/auth/logout", element: <LogoutView /> },
-    { path: "/", element: <Navigate to="/app" replace /> },
 
     // Protected routes under /app
     {
@@ -64,7 +74,7 @@ export const AppRoutes = () => {
     },
 
     // Catch-all - redirect to home
-    { path: "*", element: <Navigate to="/app" replace /> },
+    { path: "*", element: <Navigate to="/" replace /> },
   ]);
 
   return <>{routes}</>;
