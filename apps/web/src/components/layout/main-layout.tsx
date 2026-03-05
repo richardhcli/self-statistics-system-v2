@@ -5,7 +5,7 @@
  */
 
 import { Outlet } from "react-router-dom";
-import Header from "./header";
+import AppHeader from "./app-header";
 import { useGlobalStoreSync } from "../../hooks/use-global-store-sync";
 import { GuestBanner } from "../notifications/guest-banner";
 
@@ -22,7 +22,7 @@ export const MainLayout = () => {
   return (
     <div className="flex flex-col h-screen">
       <GuestBanner />
-      <Header />
+      <AppHeader />
       <main className="flex-1 overflow-auto">
         <Outlet />
       </main>

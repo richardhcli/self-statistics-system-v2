@@ -27,7 +27,7 @@ type GlobalTab = "journal" | "graph" | "statistics" | "integrations" | "billing"
  * 
  * @returns JSX.Element Application header
  */
-const Header: React.FC = () => {
+const AppHeader: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -71,10 +71,10 @@ const Header: React.FC = () => {
           </div>
           <div className="hidden sm:block">
             <h1 className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white leading-none">
-              Journaling <span className="text-indigo-600">AI</span>
+              <span className="text-indigo-600">Self</span> Stat Sys
             </h1>
             <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
-              Growth Records
+              IncSys
             </p>
           </div>
         </div>
@@ -95,4 +95,4 @@ const Header: React.FC = () => {
   );
 };
 
-export default Header;
+export default AppHeader;
