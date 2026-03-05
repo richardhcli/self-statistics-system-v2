@@ -3,7 +3,7 @@
  * Displays app branding, feature tabs, and user profile.
  */
 
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { BookMarked, History, Network, CreditCard, BarChart3, Terminal, Settings, Share2 } from "lucide-react";
 import { HorizontalTabNav, useTabNavigation } from "../tabs";
 import { ProfileButton } from "./profile-button";
@@ -65,7 +65,8 @@ const AppHeader: React.FC = () => {
     <header className="header-glass border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 select-none transition-colors">
       <div className="max-w-full mx-auto px-4 h-16 flex items-center justify-between gap-4">
         {/* Logo / Branding */}
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <Link to="/" className="flex items-center gap-3 flex-shrink-0">
+        
           <div className="bg-gradient-to-br from-indigo-600 to-violet-600 p-2 rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none">
             <BookMarked className="w-5 h-5 text-white" />
           </div>
@@ -77,7 +78,7 @@ const AppHeader: React.FC = () => {
               IncSys
             </p>
           </div>
-        </div>
+        </Link>
 
         {/* Horizontal Tab Navigation - Centered */}
         <HorizontalTabNav

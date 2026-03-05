@@ -8,6 +8,7 @@
 import React from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { ArrowRight, BookMarked } from "lucide-react";
+import { useAuth } from "../../providers/auth-provider";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -26,6 +27,8 @@ const getNavClassName = ({ isActive }: { isActive: boolean }) =>
     .join(" ");
 
 export const PublicLayout: React.FC = () => {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 text-slate-900 dark:text-slate-50">
       <header className="border-b border-slate-200/70 dark:border-slate-800/70 backdrop-blur bg-white/70 dark:bg-slate-950/60 sticky top-0 z-40">
@@ -52,9 +55,8 @@ export const PublicLayout: React.FC = () => {
 
           <Link
             to="/auth/login"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 transition-colors"
-          >
-            Login
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 transition-colors">
+            {user ? `${user.displayName || "User"} System` : "Login"}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
