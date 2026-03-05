@@ -7,8 +7,8 @@ The Neural Second Brain is built on a modern, high-performance stack designed fo
 ## Core Frameworks
 - **React 19** (`^19.2.3`): Leverages the latest concurrent rendering features and `useTransition` for smooth UI updates during heavy AI processing.
 - **TypeScript** (`~5.8.2`): Strict mode for comprehensive type safety.
-- **Vite 6** (`^6.2.0`): Fast build tooling with HMR. Custom path aliases: `@web/` → `apps/web/src/`, `@self-stats/*` → workspace packages.
-- **Tailwind CSS 4** (`^4.1.18`): Utility-first styling for a high-contrast, professional-grade interface with native Dark Mode support.
+- **Vite 6** (`^6.2.0`): Fast build tooling with HMR. Custom path aliases: `@web/` → `apps/web/src/`, `@docs/` → `docs/`, `@self-stats/*` → workspace packages.
+- **Tailwind CSS 4** (`^4.2.1`): Utility-first styling via PostCSS pipeline (`@tailwindcss/postcss`). CSS-native v4 configuration — `@source`, `@theme`, `@variant` directives in `global.css` (no JS config file). Dark mode via `class` strategy. Typography plugin for markdown prose styling.
 
 ## State Management
 - **Zustand 5** (`^5.0.11`): Global state with the Separated Selector Facade Pattern. Independent stores with `idb-keyval` persistence.

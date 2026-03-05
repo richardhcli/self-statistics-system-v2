@@ -1,4 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Source scanning — paths relative to this CSS file (apps/web/src/assets/css/) */
+@source "../../**/*.{ts,tsx,js,jsx,html}";
+@source "../../../index.html";
+
+/* Dark mode: class-based toggling (matches existing <html class="dark"> usage) */
+@variant dark (&:where(.dark, .dark *));
+
+/* Theme overrides */
+@theme {
+  --font-sans: 'Inter', sans-serif;
+}
 
 :root {
   --font-sans: 'Inter', sans-serif;

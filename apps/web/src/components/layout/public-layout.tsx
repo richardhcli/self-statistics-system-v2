@@ -13,6 +13,7 @@ const navItems = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About" },
   { to: "/usage", label: "Usage" },
+  { to: "/docs", label: "Docs" },
 ];
 
 const getNavClassName = ({ isActive }: { isActive: boolean }) =>
@@ -35,9 +36,9 @@ export const PublicLayout: React.FC = () => {
             </span>
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 font-semibold">
-                Self-Statistics
+                IncSys
               </p>
-              <p className="text-lg font-extrabold leading-tight">Journaling AI</p>
+              <p className="text-lg font-extrabold leading-tight">Self Statistics System</p>
             </div>
           </Link>
 
@@ -66,8 +67,7 @@ export const PublicLayout: React.FC = () => {
       <footer className="border-t border-slate-200/70 dark:border-slate-800/70 bg-white/70 dark:bg-slate-950/60">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-sm text-slate-600 dark:text-slate-400">
           <div>
-            <p className="font-semibold text-slate-800 dark:text-slate-100">Self-Statistics System</p>
-            <p className="text-slate-500 dark:text-slate-400">Gamify your growth through reflective practice.</p>
+            <p className="font-semibold text-slate-800 dark:text-slate-100">Self Statistics System</p>
           </div>
           <div className="flex gap-4">
             <Link to="/usage" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">

@@ -40,14 +40,11 @@ export const LandingPage: React.FC = () => {
     <div className="space-y-16">
       <section className="grid gap-10 lg:grid-cols-2 items-center">
         <div className="space-y-6">
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-100 font-semibold text-xs">
-            Gamify your growth
-          </span>
           <h1 className="text-4xl sm:text-5xl font-black leading-tight">
-            Track your life like a season of progress.
+            A Status Screen, for Real Life.
           </h1>
           <p className="text-lg text-slate-700 dark:text-slate-300 max-w-2xl">
-            The Self-Statistics System pairs intentional journaling with AI analysis, a progression system, and a knowledge graph so you can see the story behind your habits.
+            The Self-Statistics System maintains a personal statistical view of your own progress over time, sourcing reflection and motivation. 
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
@@ -64,20 +61,6 @@ export const LandingPage: React.FC = () => {
               See how it works
             </Link>
           </div>
-          <div className="grid sm:grid-cols-3 gap-4 text-sm text-slate-700 dark:text-slate-300">
-            <div className="p-3 rounded-lg bg-white/60 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/70 shadow-sm">
-              <p className="font-bold">Hybrid Read-Aside</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Firebase as source of truth, Zustand + IndexedDB locally.</p>
-            </div>
-            <div className="p-3 rounded-lg bg-white/60 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/70 shadow-sm">
-              <p className="font-bold">Privacy-forward</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Your data stays yours with clear visibility into sync.</p>
-            </div>
-            <div className="p-3 rounded-lg bg-white/60 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800/70 shadow-sm">
-              <p className="font-bold">Designed for momentum</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">XP, streaks, and stats keep feedback loops tight.</p>
-            </div>
-          </div>
         </div>
 
         <div className="relative">
@@ -86,26 +69,43 @@ export const LandingPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 font-semibold">Core loop</p>
-                <p className="text-xl font-bold">Journal → Analyze → Progress</p>
+                <p className="text-xl font-bold">Journal → Analysis → Statistics</p>
               </div>
               <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-200 text-xs font-bold">Live</span>
             </div>
             <div className="grid gap-3">
-              {["Capture insights", "AI breakdown", "Level up"].map((step, index) => (
-                <div key={step} className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-indigo-200/40">
-                    {index + 1}
-                  </div>
-                  <div>
-                    <p className="font-semibold">{step}</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">{index === 0 && "Voice, keyboard, or quick logs."}{index === 1 && "Gemini highlights themes, actions, and blockers."}{index === 2 && "Earn XP, update stats, and see graph shifts."}</p>
-                  </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-indigo-200/40">
+                  1
                 </div>
-              ))}
+                <div>
+                  <p className="font-semibold">Capture insights</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Voice, keyboard, or API calls.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-indigo-200/40">
+                  2
+                </div>
+                <div>
+                  <p className="font-semibold">Character extractions</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">AI extracts actions, skills, characteristics</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-indigo-200/40">
+                  3
+                </div>
+                <div>
+                  <p className="font-semibold">Accumulate statistics</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Update self-character graph model, earn XP, and progress your values</p>
+                </div>
+              </div>
             </div>
             <div className="rounded-xl border border-dashed border-slate-200 dark:border-slate-700 p-4 bg-slate-50/80 dark:bg-slate-900/60">
               <p className="text-sm text-slate-700 dark:text-slate-300">
-                Crafted for builders, researchers, and anyone tracking growth over time. Connect patterns, quantify progress, and keep the narrative visible.
+                Made for those that want a human-centric value tracker. Gamify your growth; Quantify your progress. 
               </p>
             </div>
           </div>

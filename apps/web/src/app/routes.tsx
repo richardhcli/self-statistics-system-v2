@@ -6,6 +6,7 @@ import { ProtectedRoute } from "../routes";
 import { MainLayout } from "../components/layout/main-layout";
 import { PublicLayout } from "../components/layout/public-layout";
 import { AboutPage, LandingPage, UsagePage } from "../features/landing";
+import { DocsLayout } from "../features/docs";
 
 // Feature routes
 import { SettingsRoutes } from "../features/settings/routes";
@@ -23,7 +24,7 @@ import { BillingView } from "../features/billing";
  * Application routing configuration.
  * 
  * URL-based routing with nested routes:
- * - Public routes: /, /about, /usage, /auth/login
+ * - Public routes: /, /about, /usage, /docs/*, /auth/login
  * - Protected routes: /app/* (require authentication)
  * 
  * Feature routing structure:
@@ -41,6 +42,7 @@ export const AppRoutes = () => {
         { index: true, element: <LandingPage /> },
         { path: "about", element: <AboutPage /> },
         { path: "usage", element: <UsagePage /> },
+        { path: "docs/*", element: <DocsLayout /> },
       ],
     },
     { path: "/auth/login", element: <AuthView /> },

@@ -17,6 +17,7 @@
 - `/` → LandingPage (public)
 - `/about` → AboutPage (public)
 - `/usage` → UsagePage (public)
+- `/docs/*` → DocsLayout (public, see [features-docs.md](features-docs.md))
 - `/auth/*` → Auth/Logout (public), unchanged
 - `/app/*` → ProtectedRoute → MainLayout (authenticated)
 

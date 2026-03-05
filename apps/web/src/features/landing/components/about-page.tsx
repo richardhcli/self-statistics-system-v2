@@ -18,7 +18,7 @@ const pillars = [
   },
   {
     title: "Intentional loops",
-    body: "Capture → Analyze → Decide → Act. Keep the feedback loop tight so next steps are obvious.",
+    body: "Capture  Analyze  Decide  Act. Keep the feedback loop tight so next steps are obvious.",
   },
 ];
 
@@ -39,8 +39,32 @@ export const AboutPage: React.FC = () => {
         </p>
         <h1 className="text-3xl sm:text-4xl font-black leading-tight">Why Self-Statistics exists</h1>
         <p className="text-lg text-slate-700 dark:text-slate-300 max-w-3xl">
-          We built this to help builders and researchers understand their own momentum. The app connects daily journaling with AI reflections, a progression system, and a knowledge graph so you can see where to focus next.
+          How can we motivate ourselves? How can we know exactly who we are?
         </p>
+      </section>
+
+      {/* Background */}
+      <section className="space-y-4 p-6 rounded-2xl border border-slate-200/70 dark:border-slate-800/70 bg-white/80 dark:bg-slate-900/70 shadow-sm">
+        <h2 className="text-xl font-bold">The idea</h2>
+        <p className="text-sm text-slate-700 dark:text-slate-300">
+          {"The solution to both questions is a single-source-of-truth quantifiable \u2018status\u2019. Such a status would display a state of ourselves in quantifiable data (knowledge of who we are), and changes to it as we act would serve as direct immediate positive feedback (motivation)."}
+        </p>
+        <p className="text-sm text-slate-700 dark:text-slate-300">
+          {"In games and media, this is commonly seen as a \u201Cstatus screen\u201D \u2014 a screen that displays the player\u2019s level and statistics like \u2018hp / mp\u2019, \u2018int\u2019, \u2018str\u2019, etc. If such a screen existed \u2014 an extremely convenient way to see our own status and statistics, updated automatically \u2014 wouldn\u2019t that be amazing?"}
+        </p>
+      </section>
+
+      {/* Implementation details */}
+      <section className="space-y-4 p-6 rounded-2xl bg-slate-900 text-white dark:bg-slate-950 border border-slate-800/80 shadow-lg">
+        <p className="text-sm uppercase tracking-[0.3em] text-indigo-200 font-semibold">Implementation</p>
+        <h3 className="text-2xl font-bold">Under the hood</h3>
+        <ul className="space-y-2 text-sm text-slate-200">
+          <li className="flex items-start gap-2"><span className="mt-[2px] text-indigo-200">&bull;</span><span><strong>{"Experience & Levels"}</strong>{" \u2014 Experience measures time invested; Levels measure skill. Both are computed via LLM pipelines rather than hard-coded rules."}</span></li>
+          <li className="flex items-start gap-2"><span className="mt-[2px] text-indigo-200">&bull;</span><span><strong>Journal entries</strong>{" \u2014 Voice-to-text or manual input feeds the inference pipeline."}</span></li>
+          <li className="flex items-start gap-2"><span className="mt-[2px] text-indigo-200">&bull;</span><span>{"CDAG (Characteristic Directed Acyclic Graph) \u2014 A graph of human characteristics: Characteristics (intelligence, wisdom, fitness\u2026) \u2192 Skills (memorization, technique\u2026) \u2192 Actions (studying, exercising\u2026). Edge weights represent proportions."}</span></li>
+          <li className="flex items-start gap-2"><span className="mt-[2px] text-indigo-200">&bull;</span><span>{"Experience pipeline: User entry \u2192 extract actions & time \u2192 convert to XP \u2192 forward-feed through CDAG recursively \u2192 generate total XP changes for all nodes \u2192 return and store results."}</span></li>
+          <li className="flex items-start gap-2"><span className="mt-[2px] text-indigo-200">&bull;</span><span>Inspired by feedforward and backpropagation algorithms in neural networks.</span></li>
+        </ul>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
@@ -73,7 +97,7 @@ export const AboutPage: React.FC = () => {
               <Workflow className="w-5 h-5 text-indigo-500 dark:text-indigo-300 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Simple, repeatable flows</p>
-                <p className="text-slate-600 dark:text-slate-400">The same loop—capture, AI analysis, update stats—works for journaling, research, or habit tracking.</p>
+                <p className="text-slate-600 dark:text-slate-400">{`The same loop \u2014 capture, AI analysis, update stats \u2014 works for journaling, research, or habit tracking.`}</p>
               </div>
             </li>
             <li className="flex gap-3">
@@ -88,11 +112,11 @@ export const AboutPage: React.FC = () => {
 
         <div className="p-6 rounded-2xl bg-slate-900 text-white dark:bg-slate-950 border border-slate-800/80 shadow-lg space-y-4">
           <p className="text-sm uppercase tracking-[0.3em] text-indigo-200 font-semibold">Tech transparency</p>
-          <h3 className="text-2xl font-bold">Under the hood</h3>
+          <h3 className="text-2xl font-bold">Stack overview</h3>
           <ul className="space-y-2 text-sm text-slate-200">
             {tech.map((item) => (
               <li key={item} className="flex items-start gap-2">
-                <span className="mt-[2px] text-indigo-200">•</span>
+                <span className="mt-[2px] text-indigo-200">&bull;</span>
                 <span>{item}</span>
               </li>
             ))}

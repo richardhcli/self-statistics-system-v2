@@ -8,6 +8,9 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3000,
         host: '0.0.0.0',
+        fs: {
+          allow: [path.resolve(__dirname, '../..')],
+        },
       },
       plugins: [react()],
       define: {
@@ -16,8 +19,8 @@ export default defineConfig(({ mode }) => {
       },
       resolve: {
         alias: {
-          '@web': path.resolve(__dirname, './src')
-          // '@systems': path.resolve(__dirname, './src/systems'), //out of date
+          '@web': path.resolve(__dirname, './src'),
+          '@docs': path.resolve(__dirname, '../../docs'),
         }
       }
     };
