@@ -3,6 +3,7 @@
  */
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { loginWithGoogle } from "../utils/login-google";
 import { loginAsGuest } from "../utils/login-guest";
 
@@ -39,6 +40,8 @@ export const LoginForm = () => {
     }
   };
 
+  const navigate = useNavigate();
+
   return (
     <div className="flex flex-col gap-3">
       <button onClick={handleLogin} className="google-btn border border-gray-300" disabled={isSubmitting}>
@@ -51,6 +54,14 @@ export const LoginForm = () => {
       >
         {isSubmitting ? "Signing in..." : "Continue as Guest"}
       </button>
+
+      <button
+        onClick={() => navigate("/")}
+        className="text-sm text-indigo-600 hover:underline"
+      >
+        Go home
+      </button>
+
       {error && <p className="text-sm text-red-500">{error}</p>}
     </div>
   );
