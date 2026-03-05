@@ -13,7 +13,7 @@ const navItems = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About" },
   { to: "/usage", label: "Usage" },
-  { to: "/docs", label: "Docs" },
+  { to: "/docs", label: "User Instructions" },
 ];
 
 const getNavClassName = ({ isActive }: { isActive: boolean }) =>

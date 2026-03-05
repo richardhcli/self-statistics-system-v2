@@ -40,12 +40,18 @@ export const LandingPage: React.FC = () => {
     <div className="space-y-16">
       <section className="grid gap-10 lg:grid-cols-2 items-center">
         <div className="space-y-6">
+
+        {/* Hero section */}
           <h1 className="text-4xl sm:text-5xl font-black leading-tight">
-            A Status Screen, for Real Life.
+            A Status Screen,
+            <br />
+            for Real Life.
           </h1>
           <p className="text-lg text-slate-700 dark:text-slate-300 max-w-2xl">
             The Self-Statistics System maintains a personal statistical view of your own progress over time, sourcing reflection and motivation. 
           </p>
+
+        {/* Call-to-action buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
               to={ctaHref}
@@ -63,6 +69,7 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
 
+            {/* Visual section */}
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-200 via-white to-purple-100 dark:from-indigo-900/40 dark:via-slate-900 dark:to-fuchsia-900/30 blur-3xl rounded-3xl" aria-hidden />
           <div className="relative p-6 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 shadow-2xl space-y-6">
@@ -111,6 +118,14 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      <div className="rounded-md bg-yellow-50 dark:bg-yellow-900/40 p-4">
+        <p className="text-sm text-yellow-800 dark:text-yellow-200">
+          <strong>Warning:</strong> app is in <span className="font-semibold">early alpha</span>. Expect bugs, data loss, and breaking changes. Best used for experimentation and feedback.
+          <br />
+          <em>Questions or suggestions? Or just to connect :) </em> Email <a href="mailto:rhli.richardli@gmail.com" className="underline">rhli.richardli@gmail.com</a>.
+        </p>
+      </div>
 
       <section className="space-y-6">
         <div className="flex items-center justify-between gap-3">

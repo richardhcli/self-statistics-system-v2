@@ -34,7 +34,10 @@ export const AboutPage: React.FC = () => {
         </p>
         <h1 className="text-3xl sm:text-4xl font-black leading-tight">Why Self-Statistics exists</h1>
         <p className="text-lg text-slate-700 dark:text-slate-300 max-w-3xl">
-          One of the pillars of success is motivation: the general desire or willingness of someone to do something. How does one optimize it?
+          One of the pillars of success is <span className="font-bold text-indigo-600 dark:text-indigo-300">motivation</span>: <span className="text-slate-400 dark:text-slate-500 italic">&ldquo;the general desire or willingness of someone to do something&rdquo;</span>.{" "}
+        </p>
+        <p>
+            How does one <span className="font-bold text-indigo-600 dark:text-indigo-300">optimize</span> it?
         </p>
       </section>
 

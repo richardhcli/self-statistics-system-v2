@@ -1,20 +1,20 @@
 # AI Analysis
 
-After each journal entry, the system runs an AI analysis pipeline to extract structured insights.
+After each journal entry, the system runs an AI analysis pipeline to extract structured character data.
 
 ## What It Extracts
 
-- **Themes** — Recurring topics across entries (e.g., "focus", "health", "project X").
-- **Blockers** — Issues or friction points you described.
-- **Next actions** — Suggested steps derived from your own words.
-- **Sentiment** — General tone of the entry (positive, neutral, negative).
+- **Actions** — Concrete activities you performed (e.g., studying, exercising, scheduling).
+- **Skills** — Underlying skills exercised by those actions (e.g., memorisation, bench-press technique, habit forming).
+- **Characteristics** — High-level traits impacted (e.g., intelligence, fitness, productivity).
+- **Time estimates** — Duration associated with each action, used to calculate XP.
 
 ## How It Works
 
 1. Your entry text is sent to the Gemini AI model.
-2. The model returns a structured breakdown.
-3. Insights are displayed in the AI panel next to your entry.
-4. Relevant data feeds into the progression system (XP, graph nodes).
+2. The model returns a structured breakdown of actions, skills, and characteristics.
+3. Results are displayed alongside your entry.
+4. Extracted data maps onto the CDAG and feeds into the experience system (XP, levels, graph nodes).
 
 ## Privacy
 

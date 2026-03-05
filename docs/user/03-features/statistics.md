@@ -1,17 +1,17 @@
-# Statistics Dashboard
+# Statistics Dashboard (Status Window)
 
-The statistics dashboard aggregates your journal data into trend lines, summaries, and milestone trackers.
+The statistics dashboard — the "status window" — shows your holistic current state: the time and effort you have put in, visualised as a real-life status screen.
 
 ## What's Displayed
 
-- **Weekly summary** — Entry count, average sentiment, top themes.
+- **Self-statistics view** — Current levels and XP across characteristics, skills, and actions from the CDAG.
 - **Streak tracker** — Current streak length and longest streak.
-- **XP progress** — Current level, XP earned this week, and distance to next level.
-- **Theme distribution** — Which topics appear most frequently in recent entries.
+- **XP progress** — XP earned this session/week, and distance to next level per node.
+- **Path comparison** — Various paths laid out across the levels screen so you can see which path you are on, how far you have gone, and what it takes to switch.
 
 ## Reading the Dashboard
 
-- All stats update in real time as entries are processed.
+- All stats update in real time as entries are processed through the CDAG pipeline.
 - Charts use the same data that feeds the progression system — no separate calculation.
 - Hover over chart elements for detailed breakdowns.
 
